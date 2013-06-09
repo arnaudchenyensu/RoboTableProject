@@ -34,7 +34,7 @@ class Wiimote(TrackingInterface):
         wii = 0
         return 'Connection closed'
 
-    def get_irs(self):
+    def get_leds(self):
         global wii
         wii.rpt_mode = cwiid.RPT_IR
         irs = []
