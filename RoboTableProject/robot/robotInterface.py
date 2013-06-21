@@ -1,4 +1,7 @@
+# from RoboTableProject.robot.robotInterface import RobotInterface
+# from RoboTableProject.tracking.sensorInterface import SensorInterface
 import math
+import time
 
 
 class RobotInterface(object):
@@ -9,13 +12,13 @@ class RobotInterface(object):
         self._front_led = {}
         self._back_left_led = {}
         self._back_right_led = {}
-        self._leds = {'front': self._front_led, 'left': self._back_left_led, 'right': self._back_right_led}
+        # self._leds = {'front': self._front_led, 'left': self._back_left_led, 'right': self._back_right_led}
 
     @property
     def leds(self):
         leds_location = self.sensor.get_leds()
         self._determine_led_position(leds_location[0], leds_location[1], leds_location[2])
-        return self._leds
+        return {'front': self._front_led, 'left': self._back_left_led, 'right': self._back_right_led}
 
     def _determine_led_position(self, led1, led2, led3):
         """determine led postion (e.g front_led, back_left_led and back_right_led)
@@ -78,3 +81,9 @@ class RobotInterface(object):
                 # point 1 is left and point 2 is right
                 self._back_left_led = led1
                 self._back_right_led = led2
+
+    def show_leds(self):
+        """ For testing purpose """
+        while True:
+            time.sleep(1)
+            print(self.leds)
