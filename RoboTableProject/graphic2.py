@@ -1,5 +1,5 @@
-from tracking.sensorInterface import SensorInterface
-from robot.robotInterface import RobotInterface
+from tracking.wiimote import Wiimote
+from robot.robot import Robot
 from Tkinter import *
 
 root = Tk()
@@ -18,7 +18,7 @@ root.geometry("%dx%d+0+0" % (width, height))
 #     label.after(1000, update_label)
 
 # label.after(1000, update_label)
-robot = RobotInterface(SensorInterface())
+robot = Robot(Wiimote())
 i = 0
 
 canvas = Canvas(root)
