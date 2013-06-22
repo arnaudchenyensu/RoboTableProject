@@ -1,9 +1,9 @@
 from nose.tools import *
-from RoboTableProject.tracking.sensorInterface import SensorInterface
-from RoboTableProject.robot.robotInterface import RobotInterface
+from RoboTableProject.tracking.sensor_interface import SensorInterface
+from RoboTableProject.robot.robot import Robot
 import math
 
-robot = RobotInterface(SensorInterface())
+robot = Robot(object())
 
 
 def test_robot():
