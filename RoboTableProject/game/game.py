@@ -4,6 +4,8 @@ import ImageTk
 from tracking.wiimote import Wiimote
 from robot.robot import Robot
 import time
+import numpy
+import copy
 
 
 class Game(object):
@@ -44,7 +46,7 @@ class Game(object):
         Note: Method to override when creating your own game
         """
         # Calibration
-        self.do_calibration()
+        self.x_factors, self.y_factors = self.do_calibration()
 
         # Define the width and height of a rectangle on the map,
         # and then create an array that represent the map
@@ -52,7 +54,7 @@ class Game(object):
         self.rec_height = self.screen_height / 5
         self.board = self.create_board(5, 10)
 
-        self.robot_drawing.draw(self.robot.leds, self.screen_width, self.screen_height)
+        self.robot_drawing.draw(self.robot.leds, self.x_factors, self.y_factors)
         self.canvas.pack(fill=Tkinter.BOTH, expand=1)
 
         self.canvas.after(100, self._update_map)
@@ -65,30 +67,125 @@ class Game(object):
         x_crosshair = offset
         y_crosshair = offset
         crosshair = Crosshair(self.root, self.canvas, x_crosshair, y_crosshair)
-        top_left = crosshair.get_led(self.sensor)
+        top_left_led = crosshair.get_led(self.sensor)
+        x1_screen, y1_screen = x_crosshair, y_crosshair
+        x1_wiimote, y1_wiimote = top_left_led['X'], top_left_led['Y']
 
-        # Top right crosshair
-        x_crosshair = self.screen_width - offset
-        y_crosshair = offset
-        crosshair = Crosshair(self.root, self.canvas, x_crosshair, y_crosshair)
-        top_right = crosshair.get_led(self.sensor)
+        # # Top right crosshair
+        # x_crosshair = self.screen_width - offset
+        # y_crosshair = offset
+        # crosshair = Crosshair(self.root, self.canvas, x_crosshair, y_crosshair)
+        # top_right = crosshair.get_led(self.sensor)
 
         # Bottom left crosshair
         x_crosshair = offset
         y_crosshair = self.screen_height - offset
         crosshair = Crosshair(self.root, self.canvas, x_crosshair, y_crosshair)
-        bottom_left = crosshair.get_led(self.sensor)
+        bottom_left_led = crosshair.get_led(self.sensor)
+        x2_screen, y2_screen = x_crosshair, y_crosshair
+        x2_wiimote, y2_wiimote = bottom_left_led['X'], bottom_left_led['Y']
 
-        # Bottom right crosshair
-        x_crosshair = self.screen_width - offset
-        y_crosshair = self.screen_height - offset
+        # Third point
+        x_crosshair = self.screen_width - offset*10
+        y_crosshair = self.screen_height / 2.
         crosshair = Crosshair(self.root, self.canvas, x_crosshair, y_crosshair)
-        bottom_right = crosshair.get_led(self.sensor)
+        mid_right_led = crosshair.get_led(self.sensor)
+        x3_screen, y3_screen = x_crosshair, y_crosshair
+        x3_wiimote, y3_wiimote = mid_right_led['X'], mid_right_led['Y']
 
-        self.sx = self.get_scaling_factor(self.screen_width - offset, offset,
-                                          top_right['X'], top_left['X'])
-        self.sy = self.get_scaling_factor(self.screen_height - offset, offset,
-                                          top_left['Y'], bottom_left['Y'])
+        leds_location_screen = [[x1_screen, y1_screen],
+                                [x2_screen, y2_screen],
+                                [x3_screen, y3_screen]]
+
+        leds_location_wiimote = [[x1_wiimote, 768-y1_wiimote],
+                                 [x2_wiimote, 768-y2_wiimote],
+                                 [x3_wiimote, 768-y3_wiimote]]
+
+        return(self.calculate_calibration(leds_location_screen,
+                                   leds_location_wiimote))
+
+        # # Bottom right crosshair
+        # x_crosshair = self.screen_width - offset
+        # y_crosshair = self.screen_height - offset
+        # crosshair = Crosshair(self.root, self.canvas, x_crosshair, y_crosshair)
+        # bottom_right = crosshair.get_led(self.sensor)
+
+        # self.sx = self.get_scaling_factor(self.screen_width - offset, offset,
+        #                                   top_right['X'], top_left['X'])
+        # self.sy = self.get_scaling_factor(self.screen_height - offset, offset,
+        #                                   top_left['Y'], bottom_left['Y'])
+
+    def calculate_calibration(self, leds_location_screen,
+                              leds_location_wiimote):
+        """leds_location e.g [[x1, y1], [x2, y2], [x3, y3]]"""
+        A = copy.deepcopy(leds_location_wiimote)
+        for row in A:
+            row.append(1)
+        delta = numpy.linalg.det(A)
+
+        A_x1 = copy.deepcopy(leds_location_screen)
+        i = 0
+        for row in A_x1:
+            row[1] = leds_location_wiimote[i][1]
+            row.append(1)
+            i += 1
+        delta_x1 = numpy.linalg.det(A_x1)
+
+        A_x2 = copy.deepcopy(leds_location_wiimote)
+        i = 0
+        for row in A_x2:
+            row[1] = leds_location_screen[i][0]
+            row.append(1)
+            i += 1
+        delta_x2 = numpy.linalg.det(A_x2)
+
+        A_x3 = copy.deepcopy(leds_location_wiimote)
+        i = 0
+        for row in A_x3:
+            row.append(leds_location_screen[i][0])
+            i += 1
+        delta_x3 = numpy.linalg.det(A_x3)
+
+        A_y1 = copy.deepcopy(leds_location_screen)
+        i = 0
+        for row in A_y1:
+            row[0] = row[1]
+            row[1] = leds_location_wiimote[i][1]
+            row.append(1)
+            i += 1
+        delta_y1 = numpy.linalg.det(A_y1)
+
+        A_y2 = copy.deepcopy(leds_location_wiimote)
+        i = 0
+        for row in A_y2:
+            row[1] = leds_location_screen[i][1]
+            row.append(1)
+            i += 1
+        delta_y2 = numpy.linalg.det(A_y2)
+
+        A_y3 = copy.deepcopy(leds_location_wiimote)
+        i = 0
+        for row in A_y3:
+            row.append(leds_location_screen[i][1])
+            i += 1
+        delta_y3 = numpy.linalg.det(A_y3)
+
+        alpha_x = delta_x1 / delta
+        beta_x = delta_x2 / delta
+        delta_x = delta_x3 / delta
+
+        alpha_y = delta_y1 / delta
+        beta_y = delta_y2 / delta
+        delta_y = delta_y3 / delta
+
+        x_factors = [alpha_x, beta_x, delta_x]
+        y_factors = [alpha_y, beta_y, delta_y]
+        print 'X :'
+        print x_factors
+        print 'Y :'
+        print y_factors
+        time.sleep(10)
+        return x_factors, y_factors
 
     def get_scaling_factor(self, screen_max, screen_min, wii_max, wii_min):
         screen_max = float(screen_max)
@@ -135,7 +232,7 @@ class Game(object):
 
         # Update the drawing of the robot
         # self.robot_drawing.draw(leds, self.width_offset, self.height_offset)
-        self.robot_drawing.draw(leds, self.sx, self.sy)
+        self.robot_drawing.draw(leds, self.x_factors, self.y_factors)
 
         self.canvas.after(500, self._update_map)
 
@@ -230,27 +327,35 @@ class RobotDrawing(object):
         self._circle2 = None
         self._circle3 = None
 
-    def draw(self, leds, sx, sy, width_offset=0, height_offset=0):
+    def draw(self, leds, x_factors, y_factors):
         # sx = screen_width / 1024.
         # self.sy = screen_height / 768.
-        self.sy = sy
-        # debug
-        print "sx: " + str(sx) + " sy: " + str(self.sy)
+        # self.sy = sy
+        # # debug
+        # print "sx: " + str(sx) + " sy: " + str(self.sy)
+        self.x_factors = x_factors
+        self.y_factors = y_factors
 
         # Front led
-        x1 = leds['front']['X'] / sx
-        y1 = self._update_y_coordinate(leds['front']['Y'])
-
-        #debug
-        print "sx_X1: " + str(x1) + " sy_Y1: " + str(y1)
+        x1 = leds['front']['X'] * self.x_factors[0] + leds['front']['Y'] * self.x_factors[1] + self.x_factors[2]
+        y1 = (leds['front']['X'] * self.y_factors[0] + (768 - leds['front']['Y']) * self.y_factors[1] + self.y_factors[2])
+        # y1 = leds['front']['X'] * self.y_factors[0] + leds['front']['Y'] * self.y_factors[1] + self.y_factors[2]
 
         # Left led
-        x2 = leds['left']['X'] / sx
-        y2 = self._update_y_coordinate(leds['left']['Y'])
+        x2 = leds['left']['X'] * self.x_factors[0] + leds['left']['Y'] * self.x_factors[1] + self.x_factors[2]
+        y2 = leds['left']['X'] * self.y_factors[0] + (768 - leds['left']['Y']) * self.y_factors[1] + self.y_factors[2]
 
         # Right led
-        x3 = leds['right']['X'] / sx
-        y3 = self._update_y_coordinate(leds['right']['Y'])
+        x3 = leds['right']['X'] * self.x_factors[0] + leds['right']['Y'] * self.x_factors[1] + self.x_factors[2]
+        y3 = leds['right']['X'] * self.y_factors[0] + (768 - leds['right']['Y']) * self.y_factors[1] + self.y_factors[2]
+
+        print "front: " + str(x1) + ", " + str(y1)
+        print "x_factors:"
+        print str(x_factors)
+        print "y_factors:"
+        print str(y_factors)
+        # print "left: " + str(x2) + ", " + str(y2)
+        # print "right: " + str(x3) + ", " + str(y3)
 
         if not self._circle1:
             self._circle1 = self.canvas.create_oval(x1-self.rad, y1-self.rad, x1+self.rad, y1+self.rad,
