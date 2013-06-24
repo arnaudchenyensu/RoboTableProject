@@ -1,8 +1,8 @@
 import Tkinter
 import Image
 import ImageTk
-from tracking.wiimote import Wiimote
-from robot.robot import Robot
+from RoboTableProject.tracking.wiimote import Wiimote
+from RoboTableProject.robot.robot import Robot
 import time
 import numpy
 import copy
@@ -10,15 +10,17 @@ import copy
 
 class Game(object):
     """docstring for Game"""
-    def __init__(self, name):
+    def __init__(self, name, sensor, test=False):
         self.name = name
-        self.root = Tkinter.Tk()
-        self.screen_width, self.screen_height = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
-        self._set_full_screen()
-        self.sensor = Wiimote(1024, 768)
-        self.robot = Robot(self.sensor)
-        self.canvas = Tkinter.Canvas(self.root)
-        self.robot_drawing = RobotDrawing(self.canvas, self.screen_height)
+        if test is False:
+            self.root = Tkinter.Tk()
+            self.screen_width, self.screen_height = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
+            self._set_full_screen()
+            # self.sensor = Wiimote(1024, 768)
+            self.sensor = sensor
+            self.robot = Robot(self.sensor)
+            self.canvas = Tkinter.Canvas(self.root)
+            self.robot_drawing = RobotDrawing(self.canvas)
 
         self.x_factors = None
         self.y_factors = None
@@ -213,7 +215,7 @@ class Game(object):
         print x_factors
         print 'Y :'
         print y_factors
-        time.sleep(10)
+        # time.sleep(10)
 
         return x_factors, y_factors
 
@@ -248,7 +250,6 @@ class Game(object):
 
     def is_led_on_screen(self, x, y):
         """Return if the led is on the screen.
-        Note: Don't forget to use the update_y_coordinate(self, y) method before
         """
         is_x_on_screen = ((x > -1) and (x < self.screen_width))
         is_y_on_screen = ((y > -1) and (y < self.screen_height))
@@ -273,6 +274,7 @@ class Crosshair(object):
         self.vertical_line = None
 
     def get_led(self, sensor):
+        """Draw a crosshair and return the location of the led"""
         self.sensor = sensor
         self.draw()
         self.canvas.after(500, self._get_led)
@@ -281,6 +283,10 @@ class Crosshair(object):
         return self.led
 
     def _get_led(self):
+        """This method wait until a led is detected,
+           then set self.led = led. Confusing because of the way
+           Tkinter works.
+        """
         leds = self.sensor.get_leds()
         led = leds[0]
         while led['X'] == -1:
@@ -289,10 +295,10 @@ class Crosshair(object):
             led = leds[0]
         self.delete()
         self.root.quit()
-        print led
         self.led = led
 
     def draw(self):
+        """Draw a crosshair"""
         # Before drawing, we make sure that the crosshair
         # is not drawn somewhere else
         if self.circle is not None:
@@ -314,6 +320,7 @@ class Crosshair(object):
                                                      width=2, fill=self.color)
 
     def delete(self):
+        """Delete the crosshair on the canvas"""
         self.canvas.delete(self.circle)
         self.canvas.delete(self.horizontal_line)
         self.canvas.delete(self.vertical_line)
@@ -321,9 +328,8 @@ class Crosshair(object):
 
 class RobotDrawing(object):
     """docstring for RobotDrawing"""
-    def __init__(self, canvas, screen_height, rad=10, outline_color="red", fill_color="green"):
+    def __init__(self, canvas, rad=10, outline_color="red", fill_color="green"):
         self.canvas = canvas
-        self.screen_height = screen_height
         self.rad = rad
         self.outline_color = outline_color
         self.fill_color = fill_color
@@ -334,6 +340,9 @@ class RobotDrawing(object):
         self._circle3 = None
 
     def draw(self, leds):
+        """Draw three circles corresponding
+           to the tree leds of the robot
+        """
 
         # Front led
         x1 = leds['front']['X']

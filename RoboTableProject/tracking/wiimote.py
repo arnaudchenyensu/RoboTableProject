@@ -8,7 +8,7 @@ wii = 0
 class Wiimote(SensorInterface):
     """Wiimote sensor"""
 
-    def __init__(self, width_resolution, height_resolution):
+    def __init__(self, width_resolution=1024, height_resolution=768):
         SensorInterface.__init__(self, width_resolution, height_resolution)
 
     def connect(self):
