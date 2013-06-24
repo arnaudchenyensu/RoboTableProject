@@ -235,9 +235,9 @@ class Game(object):
             num_row = int(y1 / self.rec_height)
             x = self.rec_width * num_column
             y = self.rec_height * num_row
-            # if not self._is_rec_already_drawn(num_row, num_column):
-            #     self.draw_rec(x, y, self.rec_width, self.rec_height, fill_color='#fb0')
-            #     self.board[num_row][num_column] = 1
+            if not self._is_rec_already_drawn(num_row, num_column):
+                self.draw_rec(x, y, self.rec_width, self.rec_height, fill_color='#fb0')
+                self.board[num_row][num_column] = 1
 
         # Update the drawing of the robot
         # self.robot_drawing.draw(leds, self.width_offset, self.height_offset)
