@@ -15,10 +15,46 @@ class Game(object):
         self.root = Tkinter.Tk()
         self.screen_width, self.screen_height = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
         self._set_full_screen()
-        self.sensor = Wiimote()
+        self.sensor = Wiimote(1024, 768)
         self.robot = Robot(self.sensor)
         self.canvas = Tkinter.Canvas(self.root)
         self.robot_drawing = RobotDrawing(self.canvas, self.screen_height)
+
+        self.x_factors = None
+        self.y_factors = None
+
+    @property
+    def robot_leds(self):
+        """Return the robot's leds location calibrated
+           Note: You need to do the calibration first (once)
+        """
+        if self.x_factors is None:
+            print "The calibration was not done"
+            #TODO : add throw exception
+            return False
+        else:
+            leds = self.robot.leds
+            leds['front']['X'] = (leds['front']['X'] * self.x_factors[0]
+                                  + leds['front']['Y'] * self.x_factors[1]
+                                  + self.x_factors[2])
+            leds['front']['Y'] = (leds['front']['X'] * self.y_factors[0]
+                                  + (self.sensor.height_resolution - leds['front']['Y']) * self.y_factors[1]
+                                  + self.y_factors[2])
+
+            leds['left']['X'] = (leds['left']['X'] * self.x_factors[0]
+                                 + leds['left']['Y'] * self.x_factors[1]
+                                 + self.x_factors[2])
+            leds['left']['Y'] = (leds['left']['X'] * self.y_factors[0]
+                                 + (self.sensor.height_resolution - leds['left']['Y']) * self.y_factors[1]
+                                 + self.y_factors[2])
+
+            leds['right']['X'] = (leds['right']['X'] * self.x_factors[0]
+                                  + leds['right']['Y'] * self.x_factors[1]
+                                  + self.x_factors[2])
+            leds['right']['Y'] = (leds['right']['X'] * self.y_factors[0]
+                                  + (self.sensor.height_resolution - leds['right']['Y']) * self.y_factors[1]
+                                  + self.y_factors[2])
+            return leds
 
     def create_board(self, rows, columns):
         board = []
@@ -54,13 +90,16 @@ class Game(object):
         self.rec_height = self.screen_height / 5
         self.board = self.create_board(5, 10)
 
-        self.robot_drawing.draw(self.robot.leds, self.x_factors, self.y_factors)
+        self.robot_drawing.draw(self.robot_leds)
         self.canvas.pack(fill=Tkinter.BOTH, expand=1)
 
         self.canvas.after(100, self._update_map)
         self.root.mainloop()
 
     def do_calibration(self):
+        """Draw three crosshairs and then return x_factors and y_factors
+           using the calculate_calibration method
+        """
 
         offset = 50
         # Top left crosshair
@@ -71,12 +110,6 @@ class Game(object):
         x1_screen, y1_screen = x_crosshair, y_crosshair
         x1_wiimote, y1_wiimote = top_left_led['X'], top_left_led['Y']
 
-        # # Top right crosshair
-        # x_crosshair = self.screen_width - offset
-        # y_crosshair = offset
-        # crosshair = Crosshair(self.root, self.canvas, x_crosshair, y_crosshair)
-        # top_right = crosshair.get_led(self.sensor)
-
         # Bottom left crosshair
         x_crosshair = offset
         y_crosshair = self.screen_height - offset
@@ -85,7 +118,7 @@ class Game(object):
         x2_screen, y2_screen = x_crosshair, y_crosshair
         x2_wiimote, y2_wiimote = bottom_left_led['X'], bottom_left_led['Y']
 
-        # Third point
+        # Third crosshair
         x_crosshair = self.screen_width - offset*10
         y_crosshair = self.screen_height / 2.
         crosshair = Crosshair(self.root, self.canvas, x_crosshair, y_crosshair)
@@ -97,27 +130,21 @@ class Game(object):
                                 [x2_screen, y2_screen],
                                 [x3_screen, y3_screen]]
 
-        leds_location_wiimote = [[x1_wiimote, 768-y1_wiimote],
-                                 [x2_wiimote, 768-y2_wiimote],
-                                 [x3_wiimote, 768-y3_wiimote]]
+        leds_location_wiimote = [[x1_wiimote, self.sensor.height_resolution-y1_wiimote],
+                                 [x2_wiimote, self.sensor.height_resolution-y2_wiimote],
+                                 [x3_wiimote, self.sensor.height_resolution-y3_wiimote]]
 
         return(self.calculate_calibration(leds_location_screen,
-                                   leds_location_wiimote))
-
-        # # Bottom right crosshair
-        # x_crosshair = self.screen_width - offset
-        # y_crosshair = self.screen_height - offset
-        # crosshair = Crosshair(self.root, self.canvas, x_crosshair, y_crosshair)
-        # bottom_right = crosshair.get_led(self.sensor)
-
-        # self.sx = self.get_scaling_factor(self.screen_width - offset, offset,
-        #                                   top_right['X'], top_left['X'])
-        # self.sy = self.get_scaling_factor(self.screen_height - offset, offset,
-        #                                   top_left['Y'], bottom_left['Y'])
+                                          leds_location_wiimote))
 
     def calculate_calibration(self, leds_location_screen,
                               leds_location_wiimote):
-        """leds_location e.g [[x1, y1], [x2, y2], [x3, y3]]"""
+        """leds_location e.g [[x1, y1], [x2, y2], [x3, y3]],
+           see the do_calibration method for the format.
+           For the calculation, see the pdf at the address :
+           http://www.ti.com/lit/an/slyt277/slyt277.pdf, equation (8)
+           Return x_factors and y_factors
+        """
         A = copy.deepcopy(leds_location_wiimote)
         for row in A:
             row.append(1)
@@ -180,46 +207,26 @@ class Game(object):
 
         x_factors = [alpha_x, beta_x, delta_x]
         y_factors = [alpha_y, beta_y, delta_y]
+
+        #debug
         print 'X :'
         print x_factors
         print 'Y :'
         print y_factors
         time.sleep(10)
+
         return x_factors, y_factors
 
-    def get_scaling_factor(self, screen_max, screen_min, wii_max, wii_min):
-        screen_max = float(screen_max)
-        wii_max = float(wii_max)
-        # return ((screen_max - screen_min) / (wii_max - wii_min))
-        return ((wii_max - wii_min) / (screen_max - screen_min))
-        # self.canvas.pack(fill=Tkinter.BOTH, expand=1)
-        # self.canvas.after(500, crosshair.draw)
-        # self.root.after(10000, self.root.quit)
-        # self.root.mainloop()
-
-        # leds = self.sensor.get_leds()
-        # led = leds[0]
-        # print leds
-        # while led['X'] == -1:
-        #     leds = self.sensor.get_leds()
-        #     led = leds[0]
-        # self.width_offset, self.height_offset = self.calculate_offset(led['X'], led['Y'], x_crosshair, y_crosshair)
-        # print "width_offset: " + str(self.width_offset) + " height_offset: " + str(self.height_offset)
-        # crosshair.delete()
-
-    def calculate_offset(self, x_led, y_led, x_crosshair, y_crosshair):
-        width_offset = x_crosshair - x_led
-        height_offset = y_led + y_crosshair - self.screen_height
-        return width_offset, height_offset
-
     def _update_map(self):
-        """Update the map. e.g Update circles' location and draw rectangles when needed"""
-        leds = self.robot.leds
+        """Update the map. e.g Update circles' location and
+           draw rectangles when needed
+        """
+        leds = self.robot_leds
         print leds
 
         # Front led
         x1 = leds['front']['X']
-        y1 = self.update_y_coordinate(leds['front']['Y'])
+        y1 = leds['front']['Y']
 
         if self.is_led_on_screen(x1, y1):
             num_column = int(x1 / self.rec_width)
@@ -232,7 +239,7 @@ class Game(object):
 
         # Update the drawing of the robot
         # self.robot_drawing.draw(leds, self.width_offset, self.height_offset)
-        self.robot_drawing.draw(leds, self.x_factors, self.y_factors)
+        self.robot_drawing.draw(leds)
 
         self.canvas.after(500, self._update_map)
 
@@ -246,12 +253,6 @@ class Game(object):
         is_x_on_screen = ((x > -1) and (x < self.screen_width))
         is_y_on_screen = ((y > -1) and (y < self.screen_height))
         return is_x_on_screen and is_y_on_screen
-
-    def update_y_coordinate(self, y):
-        """Update the y coordinate for Tkinter because (0, 0) correspond at the top left corner for Tkinter
-        but correspond at the bottom left corner for the Wiimote
-        """
-        return self.screen_height - y
 
     def draw_rec(self, x, y, width, height, outline_color='#fb0', fill_color=None):
         self.canvas.create_rectangle(x, y, x+width, y+height, outline=outline_color, fill=fill_color)
@@ -280,7 +281,6 @@ class Crosshair(object):
         return self.led
 
     def _get_led(self):
-        # self.draw()
         leds = self.sensor.get_leds()
         led = leds[0]
         while led['X'] == -1:
@@ -301,11 +301,17 @@ class Crosshair(object):
         self._create_lines()
 
     def _create_oval(self):
-        self.circle = self.canvas.create_oval(self.x-self.rad, self.y-self.rad, self.x+self.rad, self.y+self.rad, outline=self.color, width=2)
+        self.circle = self.canvas.create_oval(self.x-self.rad, self.y-self.rad,
+                                              self.x+self.rad, self.y+self.rad,
+                                              outline=self.color, width=2)
 
     def _create_lines(self):
-        self.horizontal_line = self.canvas.create_line(self.x-self.rad, self.y, self.x+self.rad, self.y, width=2, fill=self.color)
-        self.vertical_line = self.canvas.create_line(self.x, self.y-self.rad, self.x, self.y+self.rad, width=2, fill=self.color)
+        self.horizontal_line = self.canvas.create_line(self.x-self.rad, self.y,
+                                                       self.x+self.rad, self.y,
+                                                       width=2, fill=self.color)
+        self.vertical_line = self.canvas.create_line(self.x, self.y-self.rad,
+                                                     self.x, self.y+self.rad,
+                                                     width=2, fill=self.color)
 
     def delete(self):
         self.canvas.delete(self.circle)
@@ -327,35 +333,19 @@ class RobotDrawing(object):
         self._circle2 = None
         self._circle3 = None
 
-    def draw(self, leds, x_factors, y_factors):
-        # sx = screen_width / 1024.
-        # self.sy = screen_height / 768.
-        # self.sy = sy
-        # # debug
-        # print "sx: " + str(sx) + " sy: " + str(self.sy)
-        self.x_factors = x_factors
-        self.y_factors = y_factors
+    def draw(self, leds):
 
         # Front led
-        x1 = leds['front']['X'] * self.x_factors[0] + leds['front']['Y'] * self.x_factors[1] + self.x_factors[2]
-        y1 = (leds['front']['X'] * self.y_factors[0] + (768 - leds['front']['Y']) * self.y_factors[1] + self.y_factors[2])
-        # y1 = leds['front']['X'] * self.y_factors[0] + leds['front']['Y'] * self.y_factors[1] + self.y_factors[2]
+        x1 = leds['front']['X']
+        y1 = leds['front']['Y']
 
         # Left led
-        x2 = leds['left']['X'] * self.x_factors[0] + leds['left']['Y'] * self.x_factors[1] + self.x_factors[2]
-        y2 = leds['left']['X'] * self.y_factors[0] + (768 - leds['left']['Y']) * self.y_factors[1] + self.y_factors[2]
+        x2 = leds['left']['X']
+        y2 = leds['left']['Y']
 
         # Right led
-        x3 = leds['right']['X'] * self.x_factors[0] + leds['right']['Y'] * self.x_factors[1] + self.x_factors[2]
-        y3 = leds['right']['X'] * self.y_factors[0] + (768 - leds['right']['Y']) * self.y_factors[1] + self.y_factors[2]
-
-        print "front: " + str(x1) + ", " + str(y1)
-        print "x_factors:"
-        print str(x_factors)
-        print "y_factors:"
-        print str(y_factors)
-        # print "left: " + str(x2) + ", " + str(y2)
-        # print "right: " + str(x3) + ", " + str(y3)
+        x3 = leds['right']['X']
+        y3 = leds['right']['Y']
 
         if not self._circle1:
             self._circle1 = self.canvas.create_oval(x1-self.rad, y1-self.rad, x1+self.rad, y1+self.rad,
@@ -368,12 +358,3 @@ class RobotDrawing(object):
             self.canvas.coords(self._circle1, x1-self.rad, y1-self.rad, x1+self.rad, y1+self.rad)
             self.canvas.coords(self._circle2, x2-self.rad, y2-self.rad, x2+self.rad, y2+self.rad)
             self.canvas.coords(self._circle3, x3-self.rad, y3-self.rad, x3+self.rad, y3+self.rad)
-
-    def _update_y_coordinate(self, y):
-        """Update the y coordinate for Tkinter because (0, 0) correspond at the top left corner for Tkinter
-        but correspond at the bottom left corner for the Wiimote
-        """
-        return (768 - y) / self.sy
-        # return y * self.sy
-        # return y * self.sy
-        # return (768 - y) * self.sy

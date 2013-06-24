@@ -8,6 +8,9 @@ wii = 0
 class Wiimote(SensorInterface):
     """Wiimote sensor"""
 
+    def __init__(self, width_resolution, height_resolution):
+        SensorInterface.__init__(self, width_resolution, height_resolution)
+
     def connect(self):
         """Connect the wiimote to the dongle Bluetooth"""
         print 'Press 1 + 2 on your Wii Remote now ...'
