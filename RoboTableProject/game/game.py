@@ -1,4 +1,5 @@
-import Tkinter
+# import Tkinter
+import mtTkinter as Tkinter
 import Image
 import ImageTk
 from RoboTableProject.tracking.wiimote import Wiimote
@@ -36,27 +37,25 @@ class Game(object):
             return False
         else:
             leds = self.robot.leds
-            leds['front']['X'] = (leds['front']['X'] * self.x_factors[0]
-                                  + leds['front']['Y'] * self.x_factors[1]
-                                  + self.x_factors[2])
-            leds['front']['Y'] = (leds['front']['X'] * self.y_factors[0]
-                                  + (self.sensor.height_resolution - leds['front']['Y']) * self.y_factors[1]
-                                  + self.y_factors[2])
-
-            leds['left']['X'] = (leds['left']['X'] * self.x_factors[0]
-                                 + leds['left']['Y'] * self.x_factors[1]
-                                 + self.x_factors[2])
-            leds['left']['Y'] = (leds['left']['X'] * self.y_factors[0]
-                                 + (self.sensor.height_resolution - leds['left']['Y']) * self.y_factors[1]
-                                 + self.y_factors[2])
-
-            leds['right']['X'] = (leds['right']['X'] * self.x_factors[0]
-                                  + leds['right']['Y'] * self.x_factors[1]
-                                  + self.x_factors[2])
-            leds['right']['Y'] = (leds['right']['X'] * self.y_factors[0]
-                                  + (self.sensor.height_resolution - leds['right']['Y']) * self.y_factors[1]
-                                  + self.y_factors[2])
+            leds['front'] = self.apply_calibration_factors(leds['front'],
+                                                           self.x_factors,
+                                                           self.y_factors)
+            leds['left'] = self.apply_calibration_factors(leds['left'],
+                                                          self.x_factors,
+                                                          self.y_factors)
+            leds['right'] = self.apply_calibration_factors(leds['right'],
+                                                           self.x_factors,
+                                                           self.y_factors)
             return leds
+
+    def apply_calibration_factors(self, led, x_factors, y_factors):
+        led['X'] = (led['X'] * x_factors[0]
+                    + led['Y'] * x_factors[1]
+                    + x_factors[2])
+        led['Y'] = (led['X'] * y_factors[0]
+                    + (self.sensor.height_resolution - led['Y']) * y_factors[1]
+                    + y_factors[2])
+        return led
 
     def create_board(self, rows, columns):
         board = []
@@ -98,6 +97,9 @@ class Game(object):
         self.canvas.after(100, self._update_map)
         self.root.mainloop()
 
+    def stop(self):
+        self.root.quit()
+
     def do_calibration(self):
         """Draw three crosshairs and then return x_factors and y_factors
            using the calculate_calibration method
@@ -121,7 +123,7 @@ class Game(object):
         x2_wiimote, y2_wiimote = bottom_left_led['X'], bottom_left_led['Y']
 
         # Third crosshair
-        x_crosshair = self.screen_width - offset*10
+        x_crosshair = self.screen_width - offset*2
         y_crosshair = self.screen_height / 2.
         crosshair = Crosshair(self.root, self.canvas, x_crosshair, y_crosshair)
         mid_right_led = crosshair.get_led(self.sensor)
@@ -235,9 +237,9 @@ class Game(object):
             num_row = int(y1 / self.rec_height)
             x = self.rec_width * num_column
             y = self.rec_height * num_row
-            if not self._is_rec_already_drawn(num_row, num_column):
-                self.draw_rec(x, y, self.rec_width, self.rec_height, fill_color='#fb0')
-                self.board[num_row][num_column] = 1
+            #if not self._is_rec_already_drawn(num_row, num_column):
+                #self.draw_rec(x, y, self.rec_width, self.rec_height, fill_color='#fb0')
+                #self.board[num_row][num_column] = 1
 
         # Update the drawing of the robot
         # self.robot_drawing.draw(leds, self.width_offset, self.height_offset)

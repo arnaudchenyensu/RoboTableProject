@@ -14,7 +14,7 @@ class Wiimote(SensorInterface):
     def connect(self):
         """Connect the wiimote to the dongle Bluetooth"""
         print 'Press 1 + 2 on your Wii Remote now ...'
-        time.sleep(1)
+        time.sleep(10)
 
         # Connect to the Wii Remote. If it times out
         # then quit.
