@@ -1,0 +1,128 @@
+{% load staticfiles %}
+<html>
+    <head>
+        <title>Robot Table Server</title>
+    </head>
+
+    <style>
+        #myCanvas {
+            width: 500px;
+            height: 300px;
+            border:1px solid #000000;
+        }
+
+        #leds_box, #info_box {
+            width: 500px;
+            height: 200px;
+            border:1px solid #000000;
+            margin: 10px;
+        }
+
+        #info_box {
+
+        }
+    </style>
+<body>
+
+    <button type="button" id="start_game">Start game</button> <br/>
+    <button type="button" id="stop_game">Stop game</button> <br/>
+    <button type="button" id="irs">get IRS location</button> <br/>
+
+    <!-- <button type="button" id="irs">Get IRS</button> -->
+
+    <p>Leds location: </p>
+    <div id="leds_box">
+
+
+    </div>
+
+    <p>Information box: </p>
+    <div id="info_box">
+
+
+    </div>
+
+    <p>Robot Table: </p>
+    <div id="myCanvas">
+    </div>
+
+    <script src="{% static "js/jquery-1.10.1.min.js" %}"></script>
+    <script src="{% static "js/raphael-min.js" %}"></script>
+
+    <script id='canvas'>
+        // Creates canvas 320 × 200 at 10, 50
+        var paper = Raphael("myCanvas", 100, 100);
+
+        // Creates circle at x = 50, y = 40, with radius 10
+        var circle = paper.circle(50, 40, 10);
+        // Sets the fill attribute of the circle to red (#f00)
+        circle.attr("fill", "#f00");
+
+        // Sets the stroke attribute of the circle to white
+        circle.attr("stroke", "#fff");
+    </script>
+
+    <script>
+
+        var interval;
+        function makeHttpObject() {
+          try {return new XMLHttpRequest();}
+          catch (error) {}
+          try {return new ActiveXObject("Msxml2.XMLHTTP");}
+          catch (error) {}
+          try {return new ActiveXObject("Microsoft.XMLHTTP");}
+          catch (error) {}
+
+          throw new Error("Could not create HTTP request object.");
+        }
+
+        function displayIrs() {
+            // var request = makeHttpObject();
+            // request.open("GET", "irs/", false);
+            // request.send(null);
+            // data = request.responseText;
+            $.get("irs/", function(data) {
+                $("#leds_box").html(
+                    "Front : X:" + data['front'].X  + " Y:" + data['front'].Y + "<br/>"
+                    + "Left : X:" + data['left'].X  + " Y:" + data['left'].Y + "<br/>"
+                    + "Right : X:" + data['right'].X  + " Y:" + data['right'].Y + "<br/><br/>");
+            });
+        }
+
+        $("#irs").click(function(){
+            interval = setInterval(function(){displayIrs()}, 500);
+        });
+
+        $("#start_game").click(function() {
+            var request = makeHttpObject();
+            request.open("GET", "start_game/", false);
+            request.send(null);
+            console.log(request.responseText);
+        });
+
+        $("#stop_game").click(function() {
+            $.get("stop_game", function(data) {
+                console.log(data);
+                clearInterval(interval);
+            });
+        });
+
+
+        // $("#connect").click(function(){
+        //     var request = makeHttpObject();
+        //     request.open("GET", "connect/", false);
+        //     request.send(null);
+        //     console.log(request.responseText);
+        // });
+
+        // $("#disconnect").click(function(){
+        //     var request = makeHttpObject();
+        //     request.open("GET", "disconnect/", false);
+        //     request.send(null);
+        //     console.log(request.responseText);
+        //     clearInterval(interval);
+        // });
+
+    </script>
+</body>
+</html>
