@@ -7,8 +7,6 @@ from RoboTableProject.game.game import Game
 from RoboTableProject.tracking.wiimote import Wiimote
 import Queue
 import threading
-import subprocess
-from multiprocessing import Process
 
 # p = Process(target=_bulk_action,args=(action,objs))
 # p.start()
@@ -59,7 +57,8 @@ def launch():
     time.sleep(5)
 
     wiimote = Wiimote()
-    g = Game('test', wiimote)
+    servers = ['http://10.4.9.1:8001/', 'http://10.4.9.1:8002/']
+    g = Game('test', wiimote, servers=servers)
     path_img = '../temp5.jpg'
     g.load_map(path_img)
     g.start()
@@ -72,11 +71,6 @@ def launch():
 def stop_game(request):
     g.stop()
     return HttpResponse('Game stopped')
-
-
-def test(request):
-    return HttpResponse('Page Test')
-
 
 # def connect(request):
 #     print 'Press 1 + 2 on your Wii Remote now ...'

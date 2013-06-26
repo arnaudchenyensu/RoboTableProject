@@ -32,3 +32,10 @@ def test_led_position():
     expected_leds = {'front': leds[0], 'left': leds[1], 'right': leds[2]}
     obtained_leds = robot.leds
     assert_equal(obtained_leds, expected_leds)
+
+
+def test_centre_property():
+    expected_centreX = 3.25
+    expected_centreY = 5.5
+    assert_equal(expected_centreX, robot.centreX)
+    assert_equal(expected_centreY, robot.centreY)

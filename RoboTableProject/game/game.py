@@ -7,12 +7,19 @@ from RoboTableProject.robot.robot import Robot
 import time
 import numpy
 import copy
+from RoboTableProject.networking.network import Network
 
 
 class Game(object):
     """docstring for Game"""
-    def __init__(self, name, sensor, test=False):
+    def __init__(self, name, sensor, test=False, servers=None):
+        self.network = Network()
         self.name = name
+        if servers is None:
+            self.servers = []
+        else:
+            self.servers = servers
+
         if test is False:
             self.root = Tkinter.Tk()
             self.screen_width, self.screen_height = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
@@ -82,8 +89,23 @@ class Game(object):
         """Launch the game.
         Note: Method to override when creating your own game
         """
+        #debug
+        print "Width " + str(self.screen_width)
+        print "height " + str(self.screen_height)
+
         # Calibration
         self.x_factors, self.y_factors = self.do_calibration()
+
+        #debug
+        print "X factors:"
+        print "alpha: " + str(self.x_factors[0])
+        print "beta: " + str(self.x_factors[1])
+        print "delta: " + str(self.x_factors[2])
+
+        print "Y factors:"
+        print "alpha: " + str(self.y_factors[0])
+        print "beta: " + str(self.y_factors[1])
+        print "delta: " + str(self.y_factors[2])
 
         # Define the width and height of a rectangle on the map,
         # and then create an array that represent the map
@@ -113,6 +135,9 @@ class Game(object):
         top_left_led = crosshair.get_led(self.sensor)
         x1_screen, y1_screen = x_crosshair, y_crosshair
         x1_wiimote, y1_wiimote = top_left_led['X'], top_left_led['Y']
+        #debug
+        print "Screen: X: " + str(x1_screen) + " Y: " + str(y1_screen)
+        print "Wiimote: X: " + str(x1_wiimote) + " Y: " + str(y1_wiimote)
 
         # Bottom left crosshair
         x_crosshair = offset
@@ -121,14 +146,20 @@ class Game(object):
         bottom_left_led = crosshair.get_led(self.sensor)
         x2_screen, y2_screen = x_crosshair, y_crosshair
         x2_wiimote, y2_wiimote = bottom_left_led['X'], bottom_left_led['Y']
+        #debug
+        print "Screen: X: " + str(x2_screen) + " Y: " + str(y2_screen)
+        print "Wiimote: X: " + str(x2_wiimote) + " Y: " + str(y2_wiimote)
 
         # Third crosshair
-        x_crosshair = self.screen_width - offset*2
+        x_crosshair = self.screen_width - offset*10
         y_crosshair = self.screen_height / 2.
         crosshair = Crosshair(self.root, self.canvas, x_crosshair, y_crosshair)
         mid_right_led = crosshair.get_led(self.sensor)
         x3_screen, y3_screen = x_crosshair, y_crosshair
         x3_wiimote, y3_wiimote = mid_right_led['X'], mid_right_led['Y']
+        #debug
+        print "Screen: X: " + str(x3_screen) + " Y: " + str(y3_screen)
+        print "Wiimote: X: " + str(x3_wiimote) + " Y: " + str(y3_wiimote)
 
         leds_location_screen = [[x1_screen, y1_screen],
                                 [x2_screen, y2_screen],
@@ -226,7 +257,11 @@ class Game(object):
            draw rectangles when needed
         """
         leds = self.robot_leds
+        #debug
         print leds
+        #debug
+        for server in self.servers:
+            print self.network.get(server)
 
         # Front led
         x1 = leds['front']['X']
@@ -245,7 +280,12 @@ class Game(object):
         # self.robot_drawing.draw(leds, self.width_offset, self.height_offset)
         self.robot_drawing.draw(leds)
 
-        self.canvas.after(500, self._update_map)
+        #debug : I simulate the drawing of two other robots
+        self.robot_drawing.draw(leds)
+        self.robot_drawing.draw(leds)
+
+        #debug : the delay is shorter
+        self.canvas.after(100, self._update_map)
 
     def _is_rec_already_drawn(self, num_row, num_column):
         return self.board[num_row][num_column] == 1
