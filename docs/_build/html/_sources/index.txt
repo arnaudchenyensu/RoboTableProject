@@ -6,7 +6,10 @@
 Welcome to Robot Table's documentation!
 =======================================
 
+Contents:
 
+.. toctree::
+   :maxdepth: 2
 
 User Guide
 ----------
