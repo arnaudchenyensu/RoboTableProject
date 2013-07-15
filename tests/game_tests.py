@@ -1,5 +1,5 @@
 from nose.tools import *
-from RoboTableProject.game.game import Game
+from RoboTableProject.game import Game
 
 
 class RobotTest(object):

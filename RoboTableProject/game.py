@@ -2,12 +2,11 @@
 import mtTkinter as Tkinter
 import Image
 import ImageTk
-from RoboTableProject.tracking.wiimote import Wiimote
-from RoboTableProject.robot.robot import Robot
+from robot import Robot
 import time
 import numpy
 import copy
-from RoboTableProject.networking.network import Network
+from network import Network
 
 
 class Game(object):

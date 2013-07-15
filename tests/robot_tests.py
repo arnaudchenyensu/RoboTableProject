@@ -1,22 +1,22 @@
 from nose.tools import *
-from RoboTableProject.tracking.sensor_interface import SensorInterface
-from RoboTableProject.robot.robot import Robot
+from RoboTableProject.wiimote import Wiimote
+from RoboTableProject.robot import Robot
 import math
 
 
-class SensorTest(SensorInterface):
+class SensorTest(Wiimote):
     """Simple SensorTest class"""
+
+    def __init__(self):
+        Wiimote.__init__(self, test=True)
+
     def get_leds(self):
         front_led = {"X": 3, "Y": 10}
         back_left = {"X": 5, "Y": 1}
         back_right = {"X": 2, "Y": 1}
         return [front_led, back_left, back_right]
 
-# Resolution of the wiimote
-width_resolution = 1024
-height_resolution = 768
-
-sensor = SensorTest(width_resolution, height_resolution)
+sensor = SensorTest()
 robot = Robot(sensor)
 
 
@@ -37,5 +37,8 @@ def test_led_position():
 def test_centre_property():
     expected_centreX = 3.25
     expected_centreY = 5.5
-    assert_equal(expected_centreX, robot.centreX)
-    assert_equal(expected_centreY, robot.centreY)
+    centre = robot.centre
+    centreX = centre[0]
+    centreY = centre[1]
+    assert_equal(expected_centreX, centreX)
+    assert_equal(expected_centreY, centreY)

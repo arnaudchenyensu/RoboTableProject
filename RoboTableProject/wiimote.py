@@ -1,15 +1,17 @@
 import cwiid
 import time
-from sensor_interface import SensorInterface
 
 wii = 0
 
 
-class Wiimote(SensorInterface):
+class Wiimote(object):
     """Wiimote sensor"""
 
-    def __init__(self, width_resolution=1024, height_resolution=768):
-        SensorInterface.__init__(self, width_resolution, height_resolution)
+    def __init__(self, width_resolution=1024, height_resolution=768, test=False):
+        self.width_resolution = width_resolution
+        self.height_resolution = height_resolution
+        if test is False:
+            self.connect()
 
     def connect(self):
         """Connect the wiimote to the dongle Bluetooth"""

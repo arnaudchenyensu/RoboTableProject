@@ -2,9 +2,7 @@ import math
 
 
 class Robot(object):
-    """This class represent a Robot with 3 leds
-        (2 at the back and 1 at the front)
-    """
+    """This class represent a Robot with 3 leds (2 at the back and 1 at the front)"""
 
     def __init__(self, sensor):
         self.sensor = sensor
@@ -14,15 +12,16 @@ class Robot(object):
 
     @property
     def leds(self):
-        """When this property is called, leds position is automatically updated
-            and returned.
-            (e.g {'front': {'X': 10, 'Y': 20},
-                  'left': {'X': 103, 'Y': 23},
-                  'right': {'X': 111, 'Y': 203},
-                 }
-            )
-            Note: Since leds position is automatically updated at every call, you should save
-            leds location in a variable (e.g leds = robot.leds)
+        """When this property is called, leds position is automatically updated and returned.
+
+        (e.g {'front': {'X': 10, 'Y': 20},
+        'left': {'X': 103, 'Y': 23},
+        'right': {'X': 111, 'Y': 203},
+        }
+        )
+        Note: Since leds position is automatically updated at every call, you should save
+        leds location in a variable (e.g leds = robot.leds)
+
         """
         leds_location = self.sensor.get_leds()
         self._determine_led_position(leds_location[0], leds_location[1], leds_location[2])
@@ -36,8 +35,7 @@ class Robot(object):
         return [centreX, centreY]
 
     def _determine_led_position(self, led1, led2, led3):
-        """determine and set led position (e.g front_led, back_left_led and back_right_led)
-        """
+        """determine and set led position (e.g front_led, back_left_led and back_right_led)"""
         dist_1_2 = self._get_distance_between_2_points(led1, led2)
         dist_2_3 = self._get_distance_between_2_points(led2, led3)
         dist_1_3 = self._get_distance_between_2_points(led1, led3)
@@ -74,8 +72,7 @@ class Robot(object):
         return {"X": midX, "Y": midY}
 
     def _determine_back_led_position(self, led1, led2, front_led):
-        """determine and set back led position (e.g back_left_led and back_right_led)
-        """
+        """determine and set back led position (e.g back_left_led and back_right_led)"""
         midpoint = self._get_midpoint(led1, led2)
         if led1['X'] <= led2['X']:
             if midpoint['Y'] >= front_led['Y']:
