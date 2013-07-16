@@ -40,6 +40,11 @@ API Documentation
 This part of the documentation detailed every function, class or method
 used for the Robot Table Project.
 
+.. toctree::
+   :maxdepth: 2
+
+   api
+
 
 Indices and tables
 ==================

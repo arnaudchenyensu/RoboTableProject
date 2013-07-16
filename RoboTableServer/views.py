@@ -3,8 +3,9 @@ import cwiid
 import time
 from django.utils import simplejson
 from django.shortcuts import render_to_response
-from RoboTableProject.game.game import Game
-from RoboTableProject.tracking.wiimote import Wiimote
+from RoboTableProject.game import Game
+from RoboTableProject.wiimote import Wiimote
+from RoboTableProject.network import Network
 import Queue
 import threading
 
@@ -57,8 +58,9 @@ def launch():
     time.sleep(5)
 
     wiimote = Wiimote()
+    network = Network()
     servers = ['http://10.4.9.1:8001/', 'http://10.4.9.1:8002/']
-    g = Game('test', wiimote, servers=servers)
+    g = Game(wiimote, network, servers=servers)
     path_img = '../temp5.jpg'
     g.load_map(path_img)
     g.start()

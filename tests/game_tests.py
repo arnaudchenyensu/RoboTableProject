@@ -17,8 +17,9 @@ class SensorTest(object):
         self.height_resolution = 768
 
 
+network = None
 sensor = SensorTest()
-game = Game('myGame', sensor, test=True)
+game = Game(sensor, network, test=True)
 game.sensor = sensor
 x_factors = [0.06227100287030414, 0.0054334502504480965, 9.9951064607119537]
 y_factors = [-0.01630035075134428, 0.18681300861091266, -10.145777867657028]

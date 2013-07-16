@@ -1,0 +1,377 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>API Documentation &mdash; Robot Table 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Robot Table 1.0 documentation" href="index.html" />
+    <link rel="prev" title="Quickstart" href="developer/quickstart.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="developer/quickstart.html" title="Quickstart"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Robot Table 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-RoboTableProject">
+<span id="api-documentation"></span><h1>API Documentation<a class="headerlink" href="#module-RoboTableProject" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="robot.Robot">
+<em class="property">class </em><tt class="descclassname">robot.</tt><tt class="descname">Robot</tt><big>(</big><em>sensor</em><big>)</big><a class="reference internal" href="_modules/robot.html#Robot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#robot.Robot" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class represent a Robot with 3 leds (2 at the back and 1 at the front).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sensor</strong> &#8211; Sensor that detect the infrared.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="robot.Robot.centre">
+<tt class="descname">centre</tt><a class="reference internal" href="_modules/robot.html#Robot.centre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#robot.Robot.centre" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a tuple with X and Y location of the robot&#8217;s centre</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="robot.Robot.leds">
+<tt class="descname">leds</tt><a class="reference internal" href="_modules/robot.html#Robot.leds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#robot.Robot.leds" title="Permalink to this definition">¶</a></dt>
+<dd><p>When this property is called, leds position is automatically updated and returned.</p>
+<p>Usage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">Robot</span><span class="p">(</span><span class="n">Sensor</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">leds</span>
+<span class="go">{&#39;front&#39;: {&#39;X&#39;: 10, &#39;Y&#39;: 20}, &#39;left&#39;: {&#39;X&#39;: 103, &#39;Y&#39;: 23}, &#39;right&#39;: {&#39;X&#39;: 111, &#39;Y&#39;: 203}}</span>
+</pre></div>
+</div>
+<p>Note: Since leds position is automatically updated at every call, you should save
+leds location in a variable (e.g leds = robot.leds)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="game.Game">
+<em class="property">class </em><tt class="descclassname">game.</tt><tt class="descname">Game</tt><big>(</big><em>sensor</em>, <em>network</em>, <em>name=None</em>, <em>test=False</em>, <em>servers=None</em><big>)</big><a class="reference internal" href="_modules/game.html#Game"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a game.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sensor</strong> &#8211; Sensor object that detect the infrared.</li>
+<li><strong>network</strong> &#8211; Network object that communicate with the other table</li>
+<li><strong>name</strong> &#8211; Name of the game.</li>
+<li><strong>test</strong> &#8211; Only use for test-driven.</li>
+<li><strong>servers</strong> &#8211; List containing the address of the other Robot Table.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="game.Game.do_calibration">
+<tt class="descname">do_calibration</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/game.html#Game.do_calibration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game.do_calibration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw three crosshairs and then return the calibration&#8217;s factors
+(x_factors and y_factors) using the _calculate_calibration method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="game.Game.load_map">
+<tt class="descname">load_map</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/game.html#Game.load_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game.load_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the map</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="game.Game.robot_leds">
+<tt class="descname">robot_leds</tt><a class="reference internal" href="_modules/game.html#Game.robot_leds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game.robot_leds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the robot&#8217;s leds location calibrated.</p>
+<p>Note: You need to do the calibration first (once).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="game.Game.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/game.html#Game.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch the game.</p>
+<p>Note: This is the method to override when creating your own game.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="game.Game.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/game.html#Game.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop the game.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="game.Crosshair">
+<em class="property">class </em><tt class="descclassname">game.</tt><tt class="descname">Crosshair</tt><big>(</big><em>root</em>, <em>canvas</em>, <em>x</em>, <em>y</em>, <em>rad=30</em>, <em>color='red'</em><big>)</big><a class="reference internal" href="_modules/game.html#Crosshair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Crosshair" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Crosshair object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>root</strong> &#8211; Main window of the application.</li>
+<li><strong>canvas</strong> &#8211; Canvas of the application.</li>
+<li><strong>x</strong> &#8211; x location of the Crosshair.</li>
+<li><strong>y</strong> &#8211; y location of the Crosshair.</li>
+<li><strong>rad</strong> &#8211; Crosshair&#8217;s radius.</li>
+<li><strong>color</strong> &#8211; Crosshair&#8217;s color.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="game.Crosshair.delete">
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/game.html#Crosshair.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Crosshair.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the crosshair on the canvas.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="game.Crosshair.draw">
+<tt class="descname">draw</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/game.html#Crosshair.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Crosshair.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw the Crosshair on the screen.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="game.Crosshair.get_led">
+<tt class="descname">get_led</tt><big>(</big><em>sensor</em><big>)</big><a class="reference internal" href="_modules/game.html#Crosshair.get_led"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Crosshair.get_led" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a crosshair, set and return the location of the led.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="game.RobotDrawing">
+<em class="property">class </em><tt class="descclassname">game.</tt><tt class="descname">RobotDrawing</tt><big>(</big><em>canvas</em>, <em>rad=10</em>, <em>outline_color='red'</em>, <em>fill_color='green'</em><big>)</big><a class="reference internal" href="_modules/game.html#RobotDrawing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.RobotDrawing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a RobotDrawing object, represented by 3 dots on the screen.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>canvas</strong> &#8211; Canvas of the application.</li>
+<li><strong>rad</strong> &#8211; Radius of the dots.</li>
+<li><strong>outline_color</strong> &#8211; Outline color of the dots.</li>
+<li><strong>fill_color</strong> &#8211; Fill color of the dots.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="game.RobotDrawing.draw">
+<tt class="descname">draw</tt><big>(</big><em>leds</em><big>)</big><a class="reference internal" href="_modules/game.html#RobotDrawing.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.RobotDrawing.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw three dots on the screen.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="wiimote.Wiimote">
+<em class="property">class </em><tt class="descclassname">wiimote.</tt><tt class="descname">Wiimote</tt><big>(</big><em>width_resolution=1024</em>, <em>height_resolution=768</em>, <em>test=False</em><big>)</big><a class="reference internal" href="_modules/wiimote.html#Wiimote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wiimote.Wiimote" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Wiimote object and
+connect to the dongle USB.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>width_resolution</strong> &#8211; Width resolution of the sensor</li>
+<li><strong>height_resolution</strong> &#8211; Height resolution of the sensor</li>
+<li><strong>test</strong> &#8211; Only use for test-driven</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="wiimote.Wiimote.connect">
+<tt class="descname">connect</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wiimote.html#Wiimote.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wiimote.Wiimote.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect the wiimote to the dongle Bluetooth.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="wiimote.Wiimote.disconnect">
+<tt class="descname">disconnect</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wiimote.html#Wiimote.disconnect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wiimote.Wiimote.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnect the wiimote to the dongle Bluetooth.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="wiimote.Wiimote.get_leds">
+<tt class="descname">get_leds</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wiimote.html#Wiimote.get_leds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wiimote.Wiimote.get_leds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of the location of leds detected.</p>
+<p>(e.g [{&#8216;X&#8217;: 10, &#8216;Y&#8217;: 20}, {&#8216;X&#8217;: 103, &#8216;Y&#8217;: 23}, {&#8216;X&#8217;: 111, &#8216;Y&#8217;: 203}, {&#8216;X&#8217;: 121, &#8216;Y&#8217;: 13}])</p>
+<p>Note: If the location of a led is not detected, X and Y equal -1.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="network.Network">
+<em class="property">class </em><tt class="descclassname">network.</tt><tt class="descname">Network</tt><a class="reference internal" href="_modules/network.html#Network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#network.Network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Network object.</p>
+<dl class="method">
+<dt id="network.Network.get">
+<tt class="descname">get</tt><big>(</big><em>addr</em>, <em>action=None</em><big>)</big><a class="reference internal" href="_modules/network.html#Network.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#network.Network.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get data from other table.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>addr</strong> &#8211; Address of the table.</li>
+<li><strong>action</strong> &#8211; Action name (e.g get_irs, is_ready...).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Note: You need to override this method if you want to implement
+your own action.</p>
+<p>Usage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">Network</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;10.4.9.11&#39;</span><span class="p">,</span> <span class="s">&#39;get_irs&#39;</span><span class="p">)</span>
+<span class="go">{&#39;front&#39;: {&#39;X&#39;: 10, &#39;Y&#39;: 20}, &#39;left&#39;: {&#39;X&#39;: 103, &#39;Y&#39;: 23}, &#39;right&#39;: {&#39;X&#39;: 111, &#39;Y&#39;: 203}}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="developer/quickstart.html" title="previous chapter">Quickstart</a></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/api.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2013, Arnaud.
+    </div>
+    <a href="https://github.com/kennethreitz/requests" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    <script type="text/javascript">
+    /* <![CDATA[ */
+        (function() {
+            var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
+            s.type = 'text/javascript';
+            s.async = true;
+            s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
+            t.parentNode.insertBefore(s, t);
+        })();
+    /* ]]> */
+    </script>
+        <script type="text/javascript">
+    setTimeout(function(){var a=document.createElement("script");
+    var b=document.getElementsByTagName("script")[0];
+    a.src=document.location.protocol+"//dnn506yrbagrg.cloudfront.net/pages/scripts/0013/7219.js?"+Math.floor(new Date().getTime()/3600000);
+    a.async=true;a.type="text/javascript";b.parentNode.insertBefore(a,b)}, 1);
+    </script>
+
+    <script type="text/javascript">
+        new HelloBar(36402,48802);
+    </script>
+
+
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-8742933-11']);
+      _gaq.push(['_setDomainName', 'none']);
+      _gaq.push(['_setAllowLinker', true]);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+    <script type="text/javascript">
+      (function() {
+        var t   = document.createElement('script');
+        t.type  = 'text/javascript';
+        t.async = true;
+        t.id    = 'gauges-tracker';
+        t.setAttribute('data-site-id',
+                       '4ddc27f6613f5d186d000007');
+        t.src = '//secure.gaug.es/track.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(t, s);
+      })();
+    </script>
+  </body>
+</html>

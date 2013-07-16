@@ -10,10 +10,19 @@ from network import Network
 
 
 class Game(object):
-    """docstring for Game"""
-    def __init__(self, name, sensor, test=False, servers=None):
-        self.network = Network()
+    """Create a game.
+
+    :param sensor: Sensor object that detect the infrared.
+    :param network: Network object that communicate with the other table
+    :param name: Name of the game.
+    :param test: Only use for test-driven.
+    :param servers: List containing the address of the other Robot Table.
+
+    """
+    def __init__(self, sensor, network, name=None, test=False, servers=None):
+        self.network = network
         self.name = name
+
         if servers is None:
             self.servers = []
         else:
@@ -23,7 +32,6 @@ class Game(object):
             self.root = Tkinter.Tk()
             self.screen_width, self.screen_height = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
             self._set_full_screen()
-            # self.sensor = Wiimote(1024, 768)
             self.sensor = sensor
             self.robot = Robot(self.sensor)
             self.canvas = Tkinter.Canvas(self.root)
@@ -34,8 +42,10 @@ class Game(object):
 
     @property
     def robot_leds(self):
-        """Return the robot's leds location calibrated
-           Note: You need to do the calibration first (once)
+        """Return the robot's leds location calibrated.
+
+        Note: You need to do the calibration first (once).
+
         """
         if self.x_factors is None:
             print "The calibration was not done"
@@ -43,18 +53,19 @@ class Game(object):
             return False
         else:
             leds = self.robot.leds
-            leds['front'] = self.apply_calibration_factors(leds['front'],
+            leds['front'] = self._apply_calibration_factors(leds['front'],
+                                                            self.x_factors,
+                                                            self.y_factors)
+            leds['left'] = self._apply_calibration_factors(leds['left'],
                                                            self.x_factors,
                                                            self.y_factors)
-            leds['left'] = self.apply_calibration_factors(leds['left'],
-                                                          self.x_factors,
-                                                          self.y_factors)
-            leds['right'] = self.apply_calibration_factors(leds['right'],
-                                                           self.x_factors,
-                                                           self.y_factors)
+            leds['right'] = self._apply_calibration_factors(leds['right'],
+                                                            self.x_factors,
+                                                            self.y_factors)
             return leds
 
-    def apply_calibration_factors(self, led, x_factors, y_factors):
+    def _apply_calibration_factors(self, led, x_factors, y_factors):
+        """Return the led's location calibrated."""
         led['X'] = (led['X'] * x_factors[0]
                     + led['Y'] * x_factors[1]
                     + x_factors[2])
@@ -63,13 +74,15 @@ class Game(object):
                     + y_factors[2])
         return led
 
-    def create_board(self, rows, columns):
+    def _create_board(self, rows, columns):
+        """Return a list that simulate a map"""
         board = []
         for i in range(rows):
             board.append([0] * columns)
         return board
 
     def _set_full_screen(self):
+        """Set the window in full screen"""
         self.root.overrideredirect(1)
         self.root.geometry("%dx%d+0+0" % (self.screen_width, self.screen_height))
 
@@ -86,7 +99,9 @@ class Game(object):
 
     def start(self):
         """Launch the game.
-        Note: Method to override when creating your own game
+
+        Note: This is the method to override when creating your own game.
+
         """
         #debug
         print "Width " + str(self.screen_width)
@@ -119,11 +134,12 @@ class Game(object):
         self.root.mainloop()
 
     def stop(self):
+        """Stop the game."""
         self.root.quit()
 
     def do_calibration(self):
-        """Draw three crosshairs and then return x_factors and y_factors
-           using the calculate_calibration method
+        """Draw three crosshairs and then return the calibration's factors
+        (x_factors and y_factors) using the _calculate_calibration method.
         """
 
         offset = 50
@@ -168,16 +184,19 @@ class Game(object):
                                  [x2_wiimote, self.sensor.height_resolution-y2_wiimote],
                                  [x3_wiimote, self.sensor.height_resolution-y3_wiimote]]
 
-        return(self.calculate_calibration(leds_location_screen,
-                                          leds_location_wiimote))
+        return(self._calculate_calibration(leds_location_screen,
+                                           leds_location_wiimote))
 
-    def calculate_calibration(self, leds_location_screen,
-                              leds_location_wiimote):
-        """leds_location e.g [[x1, y1], [x2, y2], [x3, y3]],
-           see the do_calibration method for the format.
-           For the calculation, see the pdf at the address :
-           http://www.ti.com/lit/an/slyt277/slyt277.pdf, equation (8)
-           Return x_factors and y_factors
+    def _calculate_calibration(self, leds_location_screen,
+                               leds_location_wiimote):
+        """Return the calibration's factors (x_factors and y_factors)
+
+        :param leds_location_screen: e.g [[x1, y1], [x2, y2], [x3, y3]]
+        :param leds_location_wiimote: e.g [[x1, y1], [x2, y2], [x3, y3]]
+
+        For the calculation, see the pdf at the address :
+        http://www.ti.com/lit/an/slyt277/slyt277.pdf, equation (8)
+
         """
         A = copy.deepcopy(leds_location_wiimote)
         for row in A:
@@ -253,7 +272,8 @@ class Game(object):
 
     def _update_map(self):
         """Update the map. e.g Update circles' location and
-           draw rectangles when needed
+        draw rectangles when needed.
+
         """
         leds = self.robot_leds
         #debug
@@ -266,13 +286,13 @@ class Game(object):
         x1 = leds['front']['X']
         y1 = leds['front']['Y']
 
-        if self.is_led_on_screen(x1, y1):
+        if self._is_led_on_screen(x1, y1):
             num_column = int(x1 / self.rec_width)
             num_row = int(y1 / self.rec_height)
             x = self.rec_width * num_column
             y = self.rec_height * num_row
             #if not self._is_rec_already_drawn(num_row, num_column):
-                #self.draw_rec(x, y, self.rec_width, self.rec_height, fill_color='#fb0')
+                #self._draw_rec(x, y, self.rec_width, self.rec_height, fill_color='#fb0')
                 #self.board[num_row][num_column] = 1
 
         # Update the drawing of the robot
@@ -287,21 +307,32 @@ class Game(object):
         self.canvas.after(100, self._update_map)
 
     def _is_rec_already_drawn(self, num_row, num_column):
+        """Return True if a rectangle is already drawn."""
         return self.board[num_row][num_column] == 1
 
-    def is_led_on_screen(self, x, y):
+    def _is_led_on_screen(self, x, y):
         """Return if the led is on the screen.
         """
         is_x_on_screen = ((x > -1) and (x < self.screen_width))
         is_y_on_screen = ((y > -1) and (y < self.screen_height))
         return is_x_on_screen and is_y_on_screen
 
-    def draw_rec(self, x, y, width, height, outline_color='#fb0', fill_color=None):
+    def _draw_rec(self, x, y, width, height, outline_color='#fb0', fill_color=None):
+        """Draw a rectangle."""
         self.canvas.create_rectangle(x, y, x+width, y+height, outline=outline_color, fill=fill_color)
 
 
 class Crosshair(object):
-    """docstring for Crosshair"""
+    """Create a Crosshair object.
+
+    :param root: Main window of the application.
+    :param canvas: Canvas of the application.
+    :param x: x location of the Crosshair.
+    :param y: y location of the Crosshair.
+    :param rad: Crosshair's radius.
+    :param color: Crosshair's color.
+
+    """
     def __init__(self, root, canvas, x, y, rad=30, color="red"):
         super(Crosshair, self).__init__()
         self.root = root
@@ -315,7 +346,7 @@ class Crosshair(object):
         self.vertical_line = None
 
     def get_led(self, sensor):
-        """Draw a crosshair and return the location of the led"""
+        """Draw a crosshair, set and return the location of the led."""
         self.sensor = sensor
         self.draw()
         self.canvas.after(500, self._get_led)
@@ -325,8 +356,10 @@ class Crosshair(object):
 
     def _get_led(self):
         """This method wait until a led is detected,
-           then set self.led = led. Confusing because of the way
-           Tkinter works.
+        then set self.led = led.
+
+        Confusing because of the way Tkinter works.
+
         """
         leds = self.sensor.get_leds()
         led = leds[0]
@@ -339,20 +372,22 @@ class Crosshair(object):
         self.led = led
 
     def draw(self):
-        """Draw a crosshair"""
+        """Draw the Crosshair on the screen."""
         # Before drawing, we make sure that the crosshair
         # is not drawn somewhere else
         if self.circle is not None:
             self.delete
         self._create_oval()
-        self._create_lines()
+        self._create_cross()
 
     def _create_oval(self):
+        """Draw an oval."""
         self.circle = self.canvas.create_oval(self.x-self.rad, self.y-self.rad,
                                               self.x+self.rad, self.y+self.rad,
                                               outline=self.color, width=2)
 
-    def _create_lines(self):
+    def _create_cross(self):
+        """Draw a cross."""
         self.horizontal_line = self.canvas.create_line(self.x-self.rad, self.y,
                                                        self.x+self.rad, self.y,
                                                        width=2, fill=self.color)
@@ -361,14 +396,21 @@ class Crosshair(object):
                                                      width=2, fill=self.color)
 
     def delete(self):
-        """Delete the crosshair on the canvas"""
+        """Delete the crosshair on the canvas."""
         self.canvas.delete(self.circle)
         self.canvas.delete(self.horizontal_line)
         self.canvas.delete(self.vertical_line)
 
 
 class RobotDrawing(object):
-    """docstring for RobotDrawing"""
+    """Create a RobotDrawing object, represented by 3 dots on the screen.
+
+    :param canvas: Canvas of the application.
+    :param rad: Radius of the dots.
+    :param outline_color: Outline color of the dots.
+    :param fill_color: Fill color of the dots.
+
+    """
     def __init__(self, canvas, rad=10, outline_color="red", fill_color="green"):
         self.canvas = canvas
         self.rad = rad
@@ -381,10 +423,7 @@ class RobotDrawing(object):
         self._circle3 = None
 
     def draw(self, leds):
-        """Draw three circles corresponding
-           to the tree leds of the robot
-        """
-
+        """Draw three dots on the screen."""
         # Front led
         x1 = leds['front']['X']
         y1 = leds['front']['Y']

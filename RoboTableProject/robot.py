@@ -2,7 +2,11 @@ import math
 
 
 class Robot(object):
-    """This class represent a Robot with 3 leds (2 at the back and 1 at the front)"""
+    """This class represent a Robot with 3 leds (2 at the back and 1 at the front).
+
+    :param sensor: Sensor that detect the infrared.
+
+    """
 
     def __init__(self, sensor):
         self.sensor = sensor
@@ -14,11 +18,12 @@ class Robot(object):
     def leds(self):
         """When this property is called, leds position is automatically updated and returned.
 
-        (e.g {'front': {'X': 10, 'Y': 20},
-        'left': {'X': 103, 'Y': 23},
-        'right': {'X': 111, 'Y': 203},
-        }
-        )
+        Usage::
+
+            >>> r = Robot(Sensor())
+            >>> r.leds
+            {'front': {'X': 10, 'Y': 20}, 'left': {'X': 103, 'Y': 23}, 'right': {'X': 111, 'Y': 203}}
+
         Note: Since leds position is automatically updated at every call, you should save
         leds location in a variable (e.g leds = robot.leds)
 
@@ -29,10 +34,12 @@ class Robot(object):
 
     @property
     def centre(self):
+        """Return a tuple with X and Y location of the robot's centre"""
+
         leds = self.leds
         centreX = ((leds['left']['X'] + leds['right']['X']) / 2. + leds['front']['X']) / 2.
         centreY = ((leds['left']['Y'] + leds['right']['Y']) / 2. + leds['front']['Y']) / 2.
-        return [centreX, centreY]
+        return (centreX, centreY)
 
     def _determine_led_position(self, led1, led2, led3):
         """determine and set led position (e.g front_led, back_left_led and back_right_led)"""
