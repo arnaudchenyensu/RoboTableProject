@@ -32,7 +32,7 @@ game.robot = robot
 def test_calculate_calibration():
     leds_location_screen = [[64, 384], [192, 192], [192, 576]]
     leds_location_wiimote = [[678, 2169], [2807, 1327], [2629, 3367]]
-    x_factors_test, y_factors_test = game.calculate_calibration(leds_location_screen, leds_location_wiimote)
+    x_factors_test, y_factors_test = game._calculate_calibration(leds_location_screen, leds_location_wiimote)
     assert_equal(x_factors_test, x_factors)
     assert_equal(y_factors_test, y_factors)
 

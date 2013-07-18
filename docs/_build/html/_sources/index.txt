@@ -6,7 +6,11 @@
 Welcome to Robot Table's documentation!
 =======================================
 
+The initial robot table project was realized by Leshi Chen, at Lincoln University. He implemented a set of toolkits in C# (Network, Robot Tracking, Game Management and Communication) to support distributed multiplayer RoboTable game development.
 
+An other project (realized by Arnaud Chen-yen-su) was to port the toolkits on a Raspberry Pi. The easiest way proved to be to rewrite the toolkits in python.
+
+This documentation is all about Arnaud's project and how to use the software on a Raspberry Pi.
 
 User Guide
 ----------
