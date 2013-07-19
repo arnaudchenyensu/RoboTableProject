@@ -25,3 +25,4 @@ Software
 * `Tkinter <http://docs.python.org/2/library/tkinter.html>`_
 * `Flask <http://flask.pocoo.org/>`_
 * `Requests <http://docs.python-requests.org/en/latest/#>`_
+* `ImageTk <http://effbot.org/imagingbook/imagetk.htm>`_
