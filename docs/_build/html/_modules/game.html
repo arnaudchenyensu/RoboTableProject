@@ -68,8 +68,7 @@
 <span class="sd">    :param robot: Robot object used on the table.</span>
 <span class="sd">    :param remote_server_object: (optional) This object will be copied and used</span>
 <span class="sd">        to simulate each other remote RoboTable.</span>
-<span class="sd">    :param addr_main_server: (optional) String representing the ip address</span>
-<span class="sd">        of the main RoboTable.</span>
+<span class="sd">    :param main_server: (optional) True if this is the main server.</span>
 <span class="sd">    :param addr_remote_servers: (optional) A list containing the address</span>
 <span class="sd">        of the other RoboTables.</span>
 <span class="sd">    :param remote: (optional) If true, indicates that the object is a remote server.</span>
@@ -82,36 +81,37 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">robot</span><span class="p">,</span>
                  <span class="n">remote_server_object</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                 <span class="n">addr_main_server</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">addr_remote_servers</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">main_server</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">addr_remote_servers</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">remote</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">robot</span> <span class="o">=</span> <span class="n">robot</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sensor</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">sensor</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remote_server_object</span> <span class="o">=</span> <span class="n">remote_server_object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ready</span> <span class="o">=</span> <span class="bp">False</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">x_factors</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y_factors</span> <span class="o">=</span> <span class="bp">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_addr</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">addr_main_server</span> <span class="o">=</span> <span class="n">addr_main_server</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_server</span> <span class="o">=</span> <span class="n">main_server</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">addr_remote_servers</span> <span class="o">=</span> <span class="n">addr_remote_servers</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">servers</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remote_servers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">servers_ready</span> <span class="o">=</span> <span class="bp">False</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">remote</span> <span class="o">=</span> <span class="n">remote</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_init_graphic</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">robot_drawing</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span>
-
         <span class="c"># Graphic variables. Initialized only if the method</span>
         <span class="c"># self._init_graphic is called</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">screen_width</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">screen_height</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_init_graphic</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">robot_drawing</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span>
 
 <div class="viewcode-block" id="Game.is_main_server"><a class="viewcode-back" href="../api.html#game.Game.is_main_server">[docs]</a>    <span class="k">def</span> <span class="nf">is_main_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return if the server is the main server.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">addr_main_server</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">addr</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_server</span>
 </div>
 <div class="viewcode-block" id="Game.get_addr"><a class="viewcode-back" href="../api.html#game.Game.get_addr">[docs]</a>    <span class="k">def</span> <span class="nf">get_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the ip address of the server.</span>
@@ -135,17 +135,17 @@
 
     <span class="k">def</span> <span class="nf">_init_servers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create the remote servers&#39; object and</span>
-<span class="sd">        append to the list self.servers.</span>
+<span class="sd">        append to the list self.remote_servers.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">addr_remote_server</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">addr_remote_servers</span><span class="p">:</span>
             <span class="n">remote_server</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_server_object</span><span class="p">)</span>
             <span class="n">remote_server</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">sensor</span><span class="o">.</span><span class="n">addr</span> <span class="o">=</span> <span class="n">addr_remote_server</span>
             <span class="n">remote_server</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">robot_drawing</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">servers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">remote_server</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remote_servers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">remote_server</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Game.draw_robots"><a class="viewcode-back" href="../api.html#game.Game.draw_robots">[docs]</a>    <span class="k">def</span> <span class="nf">draw_robots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Draw robots on the table.&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">server</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">servers</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">server</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_servers</span><span class="p">:</span>
             <span class="n">robot</span> <span class="o">=</span> <span class="n">server</span><span class="o">.</span><span class="n">robot</span>
             <span class="n">leds</span> <span class="o">=</span> <span class="n">robot</span><span class="o">.</span><span class="n">leds</span>
             <span class="n">leds</span><span class="p">[</span><span class="s">&#39;front&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_calibration_factors</span><span class="p">(</span><span class="n">leds</span><span class="p">[</span><span class="s">&#39;front&#39;</span><span class="p">],</span>
@@ -208,6 +208,8 @@
 
         <span class="c"># Calibration</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_factors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_factors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_calibration</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_servers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ready</span> <span class="o">=</span> <span class="bp">True</span>
 
         <span class="c">#debug</span>
         <span class="c"># print &quot;X factors:&quot;</span>
@@ -220,19 +222,46 @@
         <span class="c"># print &quot;beta: &quot; + str(self.y_factors[1])</span>
         <span class="c"># print &quot;delta: &quot; + str(self.y_factors[2])</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_main_server</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">synchronise_servers</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wait_servers</span><span class="p">()</span>
         <span class="c"># Define the width and height of a rectangle on the map,</span>
         <span class="c"># and then create an array that represent the map</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rec_width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen_width</span> <span class="o">/</span> <span class="mi">10</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rec_height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen_height</span> <span class="o">/</span> <span class="mi">5</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">board</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_board</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_init_servers</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">draw_robots</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">Tkinter</span><span class="o">.</span><span class="n">BOTH</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">after</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_map</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
 </div>
+    <span class="k">def</span> <span class="nf">wait_servers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">servers_ready</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">synchronise_servers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&#39;Waiting for the other servers...&#39;</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">servers_ready</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_servers_ready</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">launch_games</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">servers_ready</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">&#39;Game launched.&#39;</span>
+
+    <span class="k">def</span> <span class="nf">launch_games</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">server</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_servers</span><span class="p">:</span>
+            <span class="n">server</span><span class="o">.</span><span class="n">sensor</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s">&#39;servers_ready&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_servers_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">server</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_servers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">server</span><span class="o">.</span><span class="n">sensor</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s">&#39;is_ready&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s">&#39;False&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
 <div class="viewcode-block" id="Game.stop"><a class="viewcode-back" href="../api.html#game.Game.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Stop the game.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>

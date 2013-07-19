@@ -6,6 +6,8 @@ What's a Robot Table?
 
 Add a picture here.
 
+.. _requirements:
+
 Requirements
 ------------
 
@@ -26,3 +28,5 @@ Software
 * `Flask <http://flask.pocoo.org/>`_
 * `Requests <http://docs.python-requests.org/en/latest/#>`_
 * `ImageTk <http://effbot.org/imagingbook/imagetk.htm>`_
+
+More information on how to install these software can be found :ref:`here <installRequirements>`.

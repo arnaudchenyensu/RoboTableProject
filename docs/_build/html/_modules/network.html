@@ -77,9 +77,21 @@
 
         <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&#39;get_irs&#39;</span><span class="p">:</span>
             <span class="n">addr</span> <span class="o">+=</span> <span class="s">&#39;/irs/&#39;</span>
+
+        <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&#39;is_ready&#39;</span><span class="p">:</span>
+            <span class="n">addr</span> <span class="o">+=</span> <span class="s">&#39;/is_ready/&#39;</span>
+
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 </div>
+    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addr</span>
+        <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&#39;servers_ready&#39;</span><span class="p">:</span>
+            <span class="n">addr</span> <span class="o">+=</span> <span class="s">&#39;/servers_ready/&#39;</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
 <div class="viewcode-block" id="Network.get_leds"><a class="viewcode-back" href="../api.html#network.Network.get_leds">[docs]</a>    <span class="k">def</span> <span class="nf">get_leds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a list of the location of leds detected.</span>
 

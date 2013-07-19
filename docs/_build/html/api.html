@@ -122,7 +122,7 @@ leds location in a variable (e.g leds = robot.leds)</p>
 <h2>Game<a class="headerlink" href="#game" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="game.Game">
-<em class="property">class </em><tt class="descclassname">game.</tt><tt class="descname">Game</tt><big>(</big><em>robot</em>, <em>remote_server_object=None</em>, <em>addr_main_server=None</em>, <em>addr_remote_servers=None</em>, <em>remote=False</em>, <em>name=None</em><big>)</big><a class="reference internal" href="_modules/game.html#Game"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">game.</tt><tt class="descname">Game</tt><big>(</big><em>robot</em>, <em>remote_server_object=None</em>, <em>main_server=True</em>, <em>addr_remote_servers=None</em>, <em>remote=False</em>, <em>name=None</em><big>)</big><a class="reference internal" href="_modules/game.html#Game"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a game.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -132,8 +132,7 @@ leds location in a variable (e.g leds = robot.leds)</p>
 <li><strong>robot</strong> &#8211; Robot object used on the table.</li>
 <li><strong>remote_server_object</strong> &#8211; (optional) This object will be copied and used
 to simulate each other remote RoboTable.</li>
-<li><strong>addr_main_server</strong> &#8211; (optional) String representing the ip address
-of the main RoboTable.</li>
+<li><strong>main_server</strong> &#8211; (optional) True if this is the main server.</li>
 <li><strong>addr_remote_servers</strong> &#8211; (optional) A list containing the address
 of the other RoboTables.</li>
 <li><strong>remote</strong> &#8211; (optional) If true, indicates that the object is a remote server.

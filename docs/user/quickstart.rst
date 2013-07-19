@@ -1,2 +1,12 @@
 Quickstart
 ==========
+
+When every :ref:`requirements <requirements>` are met, you'll need to launch the X server::
+
+    $ startx
+    $ export DISPLAY=:0.0
+
+Then, you can launch a game using the script main.py::
+
+    $ python main.py
+
