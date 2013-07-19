@@ -8,9 +8,9 @@ class Wiimote(object):
     """Create a Wiimote object and
     connect to the dongle USB.
 
-    :param width_resolution: Width resolution of the sensor
-    :param height_resolution: Height resolution of the sensor
-    :param test: Only use for test-driven
+    :param width_resolution: (optional) Width resolution of the sensor
+    :param height_resolution: (optional) Height resolution of the sensor
+    :param test: (optional) Only use for test-driven
 
     """
     def __init__(self, width_resolution=1024, height_resolution=768, test=False):
@@ -49,7 +49,7 @@ class Wiimote(object):
 
         (e.g [{'X': 10, 'Y': 20}, {'X': 103, 'Y': 23}, {'X': 111, 'Y': 203}, {'X': 121, 'Y': 13}])
 
-        Note: If the location of a led is not detected, X and Y equal -1.
+        **Note:** If the location of a led is not detected, X and Y equal -1.
 
         """
         global wii

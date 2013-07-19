@@ -38,9 +38,6 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="developer/quickstart.html" title="Quickstart"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Robot Table 1.0 documentation</a> &raquo;</li> 
@@ -52,17 +49,23 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-RoboTableProject">
-<span id="api-documentation"></span><h1>API Documentation<a class="headerlink" href="#module-RoboTableProject" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="api-documentation">
+<h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="robot">
+<h2>Robot<a class="headerlink" href="#robot" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="robot.Robot">
-<em class="property">class </em><tt class="descclassname">robot.</tt><tt class="descname">Robot</tt><big>(</big><em>sensor</em><big>)</big><a class="reference internal" href="_modules/robot.html#Robot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#robot.Robot" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">robot.</tt><tt class="descname">Robot</tt><big>(</big><em>sensor</em>, <em>robot_drawing=None</em><big>)</big><a class="reference internal" href="_modules/robot.html#Robot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#robot.Robot" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class represent a Robot with 3 leds (2 at the back and 1 at the front).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sensor</strong> &#8211; Sensor that detect the infrared.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sensor</strong> &#8211; Sensor that detect the infrared.</li>
+<li><strong>robot_drawing</strong> &#8211; (optional) RobotDrawing object.</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
@@ -89,24 +92,60 @@ leds location in a variable (e.g leds = robot.leds)</p>
 </dd></dl>
 
 <dl class="class">
+<dt id="robot.RobotDrawing">
+<em class="property">class </em><tt class="descclassname">robot.</tt><tt class="descname">RobotDrawing</tt><big>(</big><em>canvas</em>, <em>rad=10</em>, <em>outline_color='red'</em>, <em>fill_color='green'</em><big>)</big><a class="reference internal" href="_modules/robot.html#RobotDrawing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#robot.RobotDrawing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a RobotDrawing object, represented by 3 dots on the screen.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>canvas</strong> &#8211; Canvas of the application.</li>
+<li><strong>rad</strong> &#8211; (optional) Radius of the dots.</li>
+<li><strong>outline_color</strong> &#8211; (optional) Outline color of the dots.</li>
+<li><strong>fill_color</strong> &#8211; (optional) Fill color of the dots.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="robot.RobotDrawing.draw">
+<tt class="descname">draw</tt><big>(</big><em>leds</em><big>)</big><a class="reference internal" href="_modules/robot.html#RobotDrawing.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#robot.RobotDrawing.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw three dots on the screen.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="game">
+<h2>Game<a class="headerlink" href="#game" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
 <dt id="game.Game">
-<em class="property">class </em><tt class="descclassname">game.</tt><tt class="descname">Game</tt><big>(</big><em>sensor</em>, <em>network</em>, <em>name=None</em>, <em>test=False</em>, <em>servers=None</em><big>)</big><a class="reference internal" href="_modules/game.html#Game"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">game.</tt><tt class="descname">Game</tt><big>(</big><em>robot</em>, <em>remote_server_object=None</em>, <em>addr_main_server=None</em>, <em>addr_remote_servers=None</em>, <em>remote=False</em>, <em>name=None</em><big>)</big><a class="reference internal" href="_modules/game.html#Game"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a game.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>sensor</strong> &#8211; Sensor object that detect the infrared.</li>
-<li><strong>network</strong> &#8211; Network object that communicate with the other table</li>
-<li><strong>name</strong> &#8211; Name of the game.</li>
-<li><strong>test</strong> &#8211; Only use for test-driven.</li>
-<li><strong>servers</strong> &#8211; List containing the address of the other Robot Table.</li>
+<li><strong>robot</strong> &#8211; Robot object used on the table.</li>
+<li><strong>remote_server_object</strong> &#8211; (optional) This object will be copied and used
+to simulate each other remote RoboTable.</li>
+<li><strong>addr_main_server</strong> &#8211; (optional) String representing the ip address
+of the main RoboTable.</li>
+<li><strong>addr_remote_servers</strong> &#8211; (optional) A list containing the address
+of the other RoboTables.</li>
+<li><strong>remote</strong> &#8211; (optional) If true, indicates that the object is a remote server.
+If false, the initialisation of the screen is performed.</li>
+<li><strong>name</strong> &#8211; (optional) Name of the game.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
+<p><strong>Note:</strong> most of the arguments are optionals to facilitate the creation of the
+remote_server_object (but have to be provided if remote=false).</p>
 <dl class="method">
 <dt id="game.Game.do_calibration">
 <tt class="descname">do_calibration</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/game.html#Game.do_calibration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game.do_calibration" title="Permalink to this definition">¶</a></dt>
@@ -115,23 +154,43 @@ leds location in a variable (e.g leds = robot.leds)</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="game.Game.load_map">
-<tt class="descname">load_map</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/game.html#Game.load_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game.load_map" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load the map</p>
+<dt id="game.Game.draw_robots">
+<tt class="descname">draw_robots</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/game.html#Game.draw_robots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game.draw_robots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw robots on the table.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="game.Game.robot_leds">
-<tt class="descname">robot_leds</tt><a class="reference internal" href="_modules/game.html#Game.robot_leds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game.robot_leds" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the robot&#8217;s leds location calibrated.</p>
-<p>Note: You need to do the calibration first (once).</p>
+<dl class="method">
+<dt id="game.Game.get_addr">
+<tt class="descname">get_addr</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/game.html#Game.get_addr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game.get_addr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the ip address of the server.</p>
+<p><strong>Note</strong>: the solution was find on <a class="reference external" href="http://goo.gl/D6FKrq">Stackoverflow</a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="game.Game.is_main_server">
+<tt class="descname">is_main_server</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/game.html#Game.is_main_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game.is_main_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return if the server is the main server.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="game.Game.load_map">
+<tt class="descname">load_map</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/game.html#Game.load_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game.load_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the map.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; Path to the map.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="game.Game.start">
 <tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/game.html#Game.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.Game.start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Launch the game.</p>
-<p>Note: This is the method to override when creating your own game.</p>
+<p><strong>Note:</strong> This is the method to override when creating your own game.</p>
 </dd></dl>
 
 <dl class="method">
@@ -155,8 +214,8 @@ leds location in a variable (e.g leds = robot.leds)</p>
 <li><strong>canvas</strong> &#8211; Canvas of the application.</li>
 <li><strong>x</strong> &#8211; x location of the Crosshair.</li>
 <li><strong>y</strong> &#8211; y location of the Crosshair.</li>
-<li><strong>rad</strong> &#8211; Crosshair&#8217;s radius.</li>
-<li><strong>color</strong> &#8211; Crosshair&#8217;s color.</li>
+<li><strong>rad</strong> &#8211; (optional) Crosshair&#8217;s radius.</li>
+<li><strong>color</strong> &#8211; (optional) Crosshair&#8217;s color.</li>
 </ul>
 </td>
 </tr>
@@ -182,32 +241,9 @@ leds location in a variable (e.g leds = robot.leds)</p>
 
 </dd></dl>
 
-<dl class="class">
-<dt id="game.RobotDrawing">
-<em class="property">class </em><tt class="descclassname">game.</tt><tt class="descname">RobotDrawing</tt><big>(</big><em>canvas</em>, <em>rad=10</em>, <em>outline_color='red'</em>, <em>fill_color='green'</em><big>)</big><a class="reference internal" href="_modules/game.html#RobotDrawing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.RobotDrawing" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a RobotDrawing object, represented by 3 dots on the screen.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>canvas</strong> &#8211; Canvas of the application.</li>
-<li><strong>rad</strong> &#8211; Radius of the dots.</li>
-<li><strong>outline_color</strong> &#8211; Outline color of the dots.</li>
-<li><strong>fill_color</strong> &#8211; Fill color of the dots.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="game.RobotDrawing.draw">
-<tt class="descname">draw</tt><big>(</big><em>leds</em><big>)</big><a class="reference internal" href="_modules/game.html#RobotDrawing.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.RobotDrawing.draw" title="Permalink to this definition">¶</a></dt>
-<dd><p>Draw three dots on the screen.</p>
-</dd></dl>
-
-</dd></dl>
-
+</div>
+<div class="section" id="wiimote">
+<h2>Wiimote<a class="headerlink" href="#wiimote" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="wiimote.Wiimote">
 <em class="property">class </em><tt class="descclassname">wiimote.</tt><tt class="descname">Wiimote</tt><big>(</big><em>width_resolution=1024</em>, <em>height_resolution=768</em>, <em>test=False</em><big>)</big><a class="reference internal" href="_modules/wiimote.html#Wiimote"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wiimote.Wiimote" title="Permalink to this definition">¶</a></dt>
@@ -218,9 +254,9 @@ connect to the dongle USB.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>width_resolution</strong> &#8211; Width resolution of the sensor</li>
-<li><strong>height_resolution</strong> &#8211; Height resolution of the sensor</li>
-<li><strong>test</strong> &#8211; Only use for test-driven</li>
+<li><strong>width_resolution</strong> &#8211; (optional) Width resolution of the sensor</li>
+<li><strong>height_resolution</strong> &#8211; (optional) Height resolution of the sensor</li>
+<li><strong>test</strong> &#8211; (optional) Only use for test-driven</li>
 </ul>
 </td>
 </tr>
@@ -243,32 +279,31 @@ connect to the dongle USB.</p>
 <tt class="descname">get_leds</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/wiimote.html#Wiimote.get_leds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#wiimote.Wiimote.get_leds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of the location of leds detected.</p>
 <p>(e.g [{&#8216;X&#8217;: 10, &#8216;Y&#8217;: 20}, {&#8216;X&#8217;: 103, &#8216;Y&#8217;: 23}, {&#8216;X&#8217;: 111, &#8216;Y&#8217;: 203}, {&#8216;X&#8217;: 121, &#8216;Y&#8217;: 13}])</p>
-<p>Note: If the location of a led is not detected, X and Y equal -1.</p>
+<p><strong>Note:</strong> If the location of a led is not detected, X and Y equal -1.</p>
 </dd></dl>
 
 </dd></dl>
 
+</div>
+<div class="section" id="network">
+<h2>Network<a class="headerlink" href="#network" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="network.Network">
-<em class="property">class </em><tt class="descclassname">network.</tt><tt class="descname">Network</tt><a class="reference internal" href="_modules/network.html#Network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#network.Network" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">network.</tt><tt class="descname">Network</tt><big>(</big><em>addr=None</em><big>)</big><a class="reference internal" href="_modules/network.html#Network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#network.Network" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Network object.</p>
 <dl class="method">
 <dt id="network.Network.get">
-<tt class="descname">get</tt><big>(</big><em>addr</em>, <em>action=None</em><big>)</big><a class="reference internal" href="_modules/network.html#Network.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#network.Network.get" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get</tt><big>(</big><em>action=None</em>, <em>addr=None</em><big>)</big><a class="reference internal" href="_modules/network.html#Network.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#network.Network.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get data from other table.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>addr</strong> &#8211; Address of the table.</li>
-<li><strong>action</strong> &#8211; Action name (e.g get_irs, is_ready...).</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>action</strong> &#8211; Action name (e.g get_irs, is_ready...).</td>
 </tr>
 </tbody>
 </table>
-<p>Note: You need to override this method if you want to implement
+<p><strong>Note:</strong> You need to override this method if you want to implement
 your own action.</p>
 <p>Usage:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">n</span> <span class="o">=</span> <span class="n">Network</span><span class="p">()</span>
@@ -278,8 +313,17 @@ your own action.</p>
 </div>
 </dd></dl>
 
+<dl class="method">
+<dt id="network.Network.get_leds">
+<tt class="descname">get_leds</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/network.html#Network.get_leds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#network.Network.get_leds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of the location of leds detected.</p>
+<p>(e.g [{&#8216;X&#8217;: 10, &#8216;Y&#8217;: 20}, {&#8216;X&#8217;: 103, &#8216;Y&#8217;: 23}, {&#8216;X&#8217;: 111, &#8216;Y&#8217;: 203}, {&#8216;X&#8217;: 121, &#8216;Y&#8217;: 13}])</p>
+<p><strong>Note:</strong> If the location of a led is not detected, X and Y equal -1.</p>
 </dd></dl>
 
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -287,7 +331,18 @@ your own action.</p>
         </div>
       </div>
       <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">API Documentation</a><ul>
+<li><a class="reference internal" href="#robot">Robot</a></li>
+<li><a class="reference internal" href="#game">Game</a></li>
+<li><a class="reference internal" href="#wiimote">Wiimote</a></li>
+<li><a class="reference internal" href="#network">Network</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="developer/quickstart.html" title="previous chapter">Quickstart</a></li>

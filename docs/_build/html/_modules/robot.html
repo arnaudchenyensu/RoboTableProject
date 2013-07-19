@@ -37,9 +37,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li><a href="../index.html">Robot Table 1.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
@@ -58,14 +55,23 @@
     <span class="sd">&quot;&quot;&quot;This class represent a Robot with 3 leds (2 at the back and 1 at the front).</span>
 
 <span class="sd">    :param sensor: Sensor that detect the infrared.</span>
+<span class="sd">    :param robot_drawing: (optional) RobotDrawing object.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">robot_drawing</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sensor</span> <span class="o">=</span> <span class="n">sensor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">robot_drawing</span> <span class="o">=</span> <span class="n">robot_drawing</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_front_led</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_back_left_led</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_back_right_led</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leds_calibrated</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">robot_drawing</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c">#TODO add exception</span>
+            <span class="k">print</span> <span class="s">&#39;No robot_drawing object&#39;</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">robot_drawing</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">leds_calibrated</span><span class="p">)</span>
 
     <span class="nd">@property</span>
 <div class="viewcode-block" id="Robot.leds"><a class="viewcode-back" href="../api.html#robot.Robot.leds">[docs]</a>    <span class="k">def</span> <span class="nf">leds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -82,9 +88,22 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">leds_location</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensor</span><span class="o">.</span><span class="n">get_leds</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_ordered</span><span class="p">(</span><span class="n">leds_location</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">leds_location</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_determine_led_position</span><span class="p">(</span><span class="n">leds_location</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">leds_location</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">leds_location</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
         <span class="k">return</span> <span class="p">{</span><span class="s">&#39;front&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_front_led</span><span class="p">,</span> <span class="s">&#39;left&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_back_left_led</span><span class="p">,</span> <span class="s">&#39;right&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_back_right_led</span><span class="p">}</span>
 </div>
+    <span class="k">def</span> <span class="nf">_is_ordered</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leds</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return if leds are already ordered</span>
+<span class="sd">        (e.g we already know what&#39;s the front led etc...).</span>
+
+<span class="sd">        Concretely, this is to know if we obtain the leds location from a sensor</span>
+<span class="sd">        or from the network.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s">&#39;front&#39;</span> <span class="ow">in</span> <span class="n">leds</span>
+
     <span class="nd">@property</span>
 <div class="viewcode-block" id="Robot.centre"><a class="viewcode-back" href="../api.html#robot.Robot.centre">[docs]</a>    <span class="k">def</span> <span class="nf">centre</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a tuple with X and Y location of the robot&#39;s centre&quot;&quot;&quot;</span>
@@ -211,7 +230,54 @@
             <span class="c">#Down</span>
             <span class="k">return</span> <span class="s">&quot;D&quot;</span>
         <span class="c">#default: not change at all</span>
-        <span class="k">return</span> <span class="s">&quot;N&quot;</span></div>
+        <span class="k">return</span> <span class="s">&quot;N&quot;</span>
+
+</div>
+<div class="viewcode-block" id="RobotDrawing"><a class="viewcode-back" href="../api.html#robot.RobotDrawing">[docs]</a><span class="k">class</span> <span class="nc">RobotDrawing</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a RobotDrawing object, represented by 3 dots on the screen.</span>
+
+<span class="sd">    :param canvas: Canvas of the application.</span>
+<span class="sd">    :param rad: (optional) Radius of the dots.</span>
+<span class="sd">    :param outline_color: (optional) Outline color of the dots.</span>
+<span class="sd">    :param fill_color: (optional) Fill color of the dots.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">canvas</span><span class="p">,</span> <span class="n">rad</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">outline_color</span><span class="o">=</span><span class="s">&quot;red&quot;</span><span class="p">,</span> <span class="n">fill_color</span><span class="o">=</span><span class="s">&quot;green&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="n">canvas</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rad</span> <span class="o">=</span> <span class="n">rad</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outline_color</span> <span class="o">=</span> <span class="n">outline_color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fill_color</span> <span class="o">=</span> <span class="n">fill_color</span>
+
+        <span class="c"># Represent the leds drawing on the canvas:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_circle1</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_circle2</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_circle3</span> <span class="o">=</span> <span class="bp">None</span>
+
+<div class="viewcode-block" id="RobotDrawing.draw"><a class="viewcode-back" href="../api.html#robot.RobotDrawing.draw">[docs]</a>    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leds</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Draw three dots on the screen.&quot;&quot;&quot;</span>
+        <span class="c"># Front led</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="n">leds</span><span class="p">[</span><span class="s">&#39;front&#39;</span><span class="p">][</span><span class="s">&#39;X&#39;</span><span class="p">]</span>
+        <span class="n">y1</span> <span class="o">=</span> <span class="n">leds</span><span class="p">[</span><span class="s">&#39;front&#39;</span><span class="p">][</span><span class="s">&#39;Y&#39;</span><span class="p">]</span>
+
+        <span class="c"># Left led</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">leds</span><span class="p">[</span><span class="s">&#39;left&#39;</span><span class="p">][</span><span class="s">&#39;X&#39;</span><span class="p">]</span>
+        <span class="n">y2</span> <span class="o">=</span> <span class="n">leds</span><span class="p">[</span><span class="s">&#39;left&#39;</span><span class="p">][</span><span class="s">&#39;Y&#39;</span><span class="p">]</span>
+
+        <span class="c"># Right led</span>
+        <span class="n">x3</span> <span class="o">=</span> <span class="n">leds</span><span class="p">[</span><span class="s">&#39;right&#39;</span><span class="p">][</span><span class="s">&#39;X&#39;</span><span class="p">]</span>
+        <span class="n">y3</span> <span class="o">=</span> <span class="n">leds</span><span class="p">[</span><span class="s">&#39;right&#39;</span><span class="p">][</span><span class="s">&#39;Y&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_circle1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_circle1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">create_oval</span><span class="p">(</span><span class="n">x1</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">y1</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">x1</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">y1</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span>
+                                                    <span class="n">outline</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outline_color</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fill_color</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_circle2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">create_oval</span><span class="p">(</span><span class="n">x2</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">y2</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">x2</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">y2</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span>
+                                                    <span class="n">outline</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outline_color</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fill_color</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_circle3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">create_oval</span><span class="p">(</span><span class="n">x3</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">y3</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">x3</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">y3</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span>
+                                                    <span class="n">outline</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outline_color</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fill_color</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_circle1</span><span class="p">,</span> <span class="n">x1</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">y1</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">x1</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">y1</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_circle2</span><span class="p">,</span> <span class="n">x2</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">y2</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">x2</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">y2</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_circle3</span><span class="p">,</span> <span class="n">x3</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">y3</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">x3</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">,</span> <span class="n">y3</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">rad</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

@@ -2,9 +2,9 @@
 import mtTkinter as Tkinter
 import Image
 import ImageTk
-from robot import Robot
-from robot import RobotDrawing
-from network import Network
+# from robot import Robot
+# from robot import RobotDrawing
+# from network import Network
 import time
 import numpy
 import copy
@@ -15,14 +15,25 @@ import socket
 class Game(object):
     """Create a game.
 
-    :param sensor: Sensor object that detect the infrared.
-    :param network: Network object that communicate with the other table
-    :param name: Name of the game.
-    :param test: Only use for test-driven.
-    :param servers: List containing the address of the other Robot Table.
+    :param robot: Robot object used on the table.
+    :param remote_server_object: (optional) This object will be copied and used
+        to simulate each other remote RoboTable.
+    :param addr_main_server: (optional) String representing the ip address
+        of the main RoboTable.
+    :param addr_remote_servers: (optional) A list containing the address
+        of the other RoboTables.
+    :param remote: (optional) If true, indicates that the object is a remote server.
+        If false, the initialisation of the screen is performed.
+    :param name: (optional) Name of the game.
+
+    **Note:** most of the arguments are optionals to facilitate the creation of the
+    remote_server_object (but have to be provided if remote=false).
 
     """
-    def __init__(self, robot, remote_server_object=None, addr_main_server=None, addr_remote_servers=None, remote=False, name=None):
+    def __init__(self, robot,
+                 remote_server_object=None,
+                 addr_main_server=None, addr_remote_servers=None,
+                 remote=False, name=None):
         self.name = name
         self.robot = robot
         self.sensor = robot.sensor
@@ -36,29 +47,26 @@ class Game(object):
         self.addr_remote_servers = addr_remote_servers
         self.servers = [self]
 
-        # if servers is None:
-        #     self.servers = []
-        # else:
-        #     self.servers = servers
         self.remote = remote
         if self.remote is False:
             self._init_graphic()
             self.robot.robot_drawing.canvas = self.canvas
 
-        # if test is False:
-            # self.robot = Robot(self.sensor, new_robot_drawing)
-            # self.robots = []
-            # self.robots.append(self.robot)
-            # self.robot_drawing = RobotDrawing(self.canvas)
+        # Graphic variables. Initialized only if the method
+        # self._init_graphic is called
+        self.root = None
+        self.screen_width = None
+        self.screen_height = None
+        self.canvas = None
 
     def is_main_server(self):
-        return addr_main_server == addr
+        """Return if the server is the main server."""
+        return self.addr_main_server == self.addr
 
     def get_addr(self):
         """Return the ip address of the server.
 
-        Note: the solution was find here :
-        http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
+        **Note**: the solution was find on `Stackoverflow <http://goo.gl/D6FKrq>`_.
 
         """
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -68,55 +76,25 @@ class Game(object):
         return addr
 
     def _init_graphic(self):
+        """Initialize the graphical part using Tkinter."""
+
         self.root = Tkinter.Tk()
         self.screen_width, self.screen_height = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
         self._set_full_screen()
         self.canvas = Tkinter.Canvas(self.root)
 
-    @property
-    def robot_leds(self):
-        """Return the robot's leds location calibrated.
-
-        Note: You need to do the calibration first (once).
-
-        """
-        if self.x_factors is None:
-            print "The calibration was not done"
-            #TODO : add throw exception
-            return False
-        else:
-            leds = self.robot.leds
-            leds['front'] = self._apply_calibration_factors(leds['front'],
-                                                            self.x_factors,
-                                                            self.y_factors)
-            leds['left'] = self._apply_calibration_factors(leds['left'],
-                                                           self.x_factors,
-                                                           self.y_factors)
-            leds['right'] = self._apply_calibration_factors(leds['right'],
-                                                            self.x_factors,
-                                                            self.y_factors)
-            return leds
-
     def _init_servers(self):
+        """Create the remote servers' object and
+        append to the list self.servers.
+        """
         for addr_remote_server in self.addr_remote_servers:
             remote_server = copy.deepcopy(self.remote_server_object)
             remote_server.robot.sensor.addr = addr_remote_server
             remote_server.robot.robot_drawing.canvas = self.canvas
-
-            # network = copy.deepcopy(self.network)
-            # network.addr = addr_remote_server
-            # robot = self._create_robot()
-            # remote_server = Game(network, robot, addr_main_server=None, sensor=None, remote=False, name=None):
             self.servers.append(remote_server)
 
-    # def add_robots(self):
-    #     for server in self.servers:
-    #         new_robot_drawing = RobotDrawing(self.canvas)
-    #         network = Network(server)
-    #         new_robot = Robot(network, robot_drawing=new_robot_drawing)
-    #         self.robots.append(new_robot)
-
     def draw_robots(self):
+        """Draw robots on the table."""
         for server in self.servers:
             robot = server.robot
             leds = robot.leds
@@ -142,19 +120,23 @@ class Game(object):
         return led
 
     def _create_board(self, rows, columns):
-        """Return a list that simulate a map"""
+        """Return a list that simulate a map."""
         board = []
         for i in range(rows):
             board.append([0] * columns)
         return board
 
     def _set_full_screen(self):
-        """Set the window in full screen"""
+        """Set the window in full screen."""
         self.root.overrideredirect(1)
         self.root.geometry("%dx%d+0+0" % (self.screen_width, self.screen_height))
 
     def load_map(self, path):
-        """Load the map"""
+        """Load the map.
+
+        :param path: Path to the map.
+
+        """
         im = Image.open(path)
         im = im.resize((self.screen_width, self.screen_height), Image.ANTIALIAS)
         # Convert the Image object into a TkPhoto object
@@ -167,26 +149,26 @@ class Game(object):
     def start(self):
         """Launch the game.
 
-        Note: This is the method to override when creating your own game.
+        **Note:** This is the method to override when creating your own game.
 
         """
         #debug
-        print "Width " + str(self.screen_width)
-        print "height " + str(self.screen_height)
+        # print "Width " + str(self.screen_width)
+        # print "height " + str(self.screen_height)
 
         # Calibration
         self.x_factors, self.y_factors = self.do_calibration()
 
         #debug
-        print "X factors:"
-        print "alpha: " + str(self.x_factors[0])
-        print "beta: " + str(self.x_factors[1])
-        print "delta: " + str(self.x_factors[2])
+        # print "X factors:"
+        # print "alpha: " + str(self.x_factors[0])
+        # print "beta: " + str(self.x_factors[1])
+        # print "delta: " + str(self.x_factors[2])
 
-        print "Y factors:"
-        print "alpha: " + str(self.y_factors[0])
-        print "beta: " + str(self.y_factors[1])
-        print "delta: " + str(self.y_factors[2])
+        # print "Y factors:"
+        # print "alpha: " + str(self.y_factors[0])
+        # print "beta: " + str(self.y_factors[1])
+        # print "delta: " + str(self.y_factors[2])
 
         # Define the width and height of a rectangle on the map,
         # and then create an array that represent the map
@@ -194,7 +176,6 @@ class Game(object):
         self.rec_height = self.screen_height / 5
         self.board = self._create_board(5, 10)
 
-        # self.robot_drawing.draw(self.robot_leds)
         self._init_servers()
         self.draw_robots()
         self.canvas.pack(fill=Tkinter.BOTH, expand=1)
@@ -220,8 +201,8 @@ class Game(object):
         x1_screen, y1_screen = x_crosshair, y_crosshair
         x1_wiimote, y1_wiimote = top_left_led['X'], top_left_led['Y']
         #debug
-        print "Screen: X: " + str(x1_screen) + " Y: " + str(y1_screen)
-        print "Wiimote: X: " + str(x1_wiimote) + " Y: " + str(y1_wiimote)
+        # print "Screen: X: " + str(x1_screen) + " Y: " + str(y1_screen)
+        # print "Wiimote: X: " + str(x1_wiimote) + " Y: " + str(y1_wiimote)
 
         # Bottom left crosshair
         x_crosshair = offset
@@ -231,8 +212,8 @@ class Game(object):
         x2_screen, y2_screen = x_crosshair, y_crosshair
         x2_wiimote, y2_wiimote = bottom_left_led['X'], bottom_left_led['Y']
         #debug
-        print "Screen: X: " + str(x2_screen) + " Y: " + str(y2_screen)
-        print "Wiimote: X: " + str(x2_wiimote) + " Y: " + str(y2_wiimote)
+        # print "Screen: X: " + str(x2_screen) + " Y: " + str(y2_screen)
+        # print "Wiimote: X: " + str(x2_wiimote) + " Y: " + str(y2_wiimote)
 
         # Third crosshair
         x_crosshair = self.screen_width - offset*10
@@ -242,8 +223,8 @@ class Game(object):
         x3_screen, y3_screen = x_crosshair, y_crosshair
         x3_wiimote, y3_wiimote = mid_right_led['X'], mid_right_led['Y']
         #debug
-        print "Screen: X: " + str(x3_screen) + " Y: " + str(y3_screen)
-        print "Wiimote: X: " + str(x3_wiimote) + " Y: " + str(y3_wiimote)
+        # print "Screen: X: " + str(x3_screen) + " Y: " + str(y3_screen)
+        # print "Wiimote: X: " + str(x3_wiimote) + " Y: " + str(y3_wiimote)
 
         leds_location_screen = [[x1_screen, y1_screen],
                                 [x2_screen, y2_screen],
@@ -263,8 +244,7 @@ class Game(object):
         :param leds_location_screen: e.g [[x1, y1], [x2, y2], [x3, y3]]
         :param leds_location_wiimote: e.g [[x1, y1], [x2, y2], [x3, y3]]
 
-        For the calculation, see the pdf at the address :
-        http://www.ti.com/lit/an/slyt277/slyt277.pdf, equation (8)
+        For the calculation, see the pdf `here <http://goo.gl/pWYifa>`_, equation (8)
 
         """
         A = copy.deepcopy(leds_location_wiimote)
@@ -344,21 +324,21 @@ class Game(object):
         draw rectangles when needed.
 
         """
-        leds = self.robot_leds
-        #debug
-        print leds
-        #debug
-        r = RobotDrawing(self.canvas)
+        # leds = self.robot_leds
+        # #debug
+        # print leds
+        # #debug
+        # r = RobotDrawing(self.canvas)
 
         # Front led
-        x1 = leds['front']['X']
-        y1 = leds['front']['Y']
+        # x1 = leds['front']['X']
+        # y1 = leds['front']['Y']
 
-        if self._is_led_on_screen(x1, y1):
-            num_column = int(x1 / self.rec_width)
-            num_row = int(y1 / self.rec_height)
-            x = self.rec_width * num_column
-            y = self.rec_height * num_row
+        # if self._is_led_on_screen(x1, y1):
+        #     num_column = int(x1 / self.rec_width)
+        #     num_row = int(y1 / self.rec_height)
+        #     x = self.rec_width * num_column
+        #     y = self.rec_height * num_row
             #if not self._is_rec_already_drawn(num_row, num_column):
                 #self._draw_rec(x, y, self.rec_width, self.rec_height, fill_color='#fb0')
                 #self.board[num_row][num_column] = 1
@@ -381,8 +361,7 @@ class Game(object):
         return self.board[num_row][num_column] == 1
 
     def _is_led_on_screen(self, x, y):
-        """Return if the led is on the screen.
-        """
+        """Return if the led is on the screen."""
         is_x_on_screen = ((x > -1) and (x < self.screen_width))
         is_y_on_screen = ((y > -1) and (y < self.screen_height))
         return is_x_on_screen and is_y_on_screen
@@ -399,8 +378,8 @@ class Crosshair(object):
     :param canvas: Canvas of the application.
     :param x: x location of the Crosshair.
     :param y: y location of the Crosshair.
-    :param rad: Crosshair's radius.
-    :param color: Crosshair's color.
+    :param rad: (optional) Crosshair's radius.
+    :param color: (optional) Crosshair's color.
 
     """
     def __init__(self, root, canvas, x, y, rad=30, color="red"):

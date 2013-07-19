@@ -1,10 +1,17 @@
 API Documentation
 =================
 
-.. module:: RoboTableProject
+Robot
+-----
 
 .. autoclass:: robot.Robot
     :members:
+
+.. autoclass:: robot.RobotDrawing
+    :members:
+
+Game
+----
 
 .. autoclass:: game.Game
     :members:
@@ -12,11 +19,14 @@ API Documentation
 .. autoclass:: game.Crosshair
     :members:
 
-.. autoclass:: game.RobotDrawing
-    :members:
+Wiimote
+-------
 
 .. autoclass:: wiimote.Wiimote
     :members:
+
+Network
+-------
 
 .. autoclass:: network.Network
     :members:

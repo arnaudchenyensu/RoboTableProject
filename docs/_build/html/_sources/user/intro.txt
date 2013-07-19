@@ -16,6 +16,7 @@ Hardware
 * Projector
 * `Rasberry Pi <http://www.raspberrypi.org/>`_
 * `Wiimote <http://www.amazon.com/Wii-Remote-Controller-Nintendo/dp/B000IMWK2G>`_
+* Dongle USB Bluetooth
 
 Software
 ^^^^^^^^
@@ -24,20 +25,3 @@ Software
 * `Tkinter <http://docs.python.org/2/library/tkinter.html>`_
 * `Flask <http://flask.pocoo.org/>`_
 * `Requests <http://docs.python-requests.org/en/latest/#>`_
-
-
-The software is composed of two parts :
-* Scripts
-* Interface/Server web
-
-The server web is needed if you won't to be able to play with other robot table.
-Otherwise you can just launch the game with the scripts.
-
-Here's the five(or more) scripts : (maybe we should write this in the developer guide)
-*
-*
-*
-
-
-
-

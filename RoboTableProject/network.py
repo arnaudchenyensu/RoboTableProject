@@ -12,7 +12,7 @@ class Network(object):
 
         :param action: Action name (e.g get_irs, is_ready...).
 
-        Note: You need to override this method if you want to implement
+        **Note:** You need to override this method if you want to implement
         your own action.
 
         Usage::
@@ -35,7 +35,7 @@ class Network(object):
 
         (e.g [{'X': 10, 'Y': 20}, {'X': 103, 'Y': 23}, {'X': 111, 'Y': 203}, {'X': 121, 'Y': 13}])
 
-        Note: If the location of a led is not detected, X and Y equal -1.
+        **Note:** If the location of a led is not detected, X and Y equal -1.
 
         """
         return self.get(action='get_irs')

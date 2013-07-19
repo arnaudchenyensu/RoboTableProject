@@ -37,9 +37,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li><a href="../index.html">Robot Table 1.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
@@ -57,13 +54,15 @@
 <div class="viewcode-block" id="Network"><a class="viewcode-back" href="../api.html#network.Network">[docs]</a><span class="k">class</span> <span class="nc">Network</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create a Network object.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Network.get"><a class="viewcode-back" href="../api.html#network.Network.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addr</span> <span class="o">=</span> <span class="n">addr</span>
+
+<div class="viewcode-block" id="Network.get"><a class="viewcode-back" href="../api.html#network.Network.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">addr</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get data from other table.</span>
 
-<span class="sd">        :param addr: Address of the table.</span>
 <span class="sd">        :param action: Action name (e.g get_irs, is_ready...).</span>
 
-<span class="sd">        Note: You need to override this method if you want to implement</span>
+<span class="sd">        **Note:** You need to override this method if you want to implement</span>
 <span class="sd">        your own action.</span>
 
 <span class="sd">        Usage::</span>
@@ -73,10 +72,23 @@
 <span class="sd">            {&#39;front&#39;: {&#39;X&#39;: 10, &#39;Y&#39;: 20}, &#39;left&#39;: {&#39;X&#39;: 103, &#39;Y&#39;: 23}, &#39;right&#39;: {&#39;X&#39;: 111, &#39;Y&#39;: 203}}</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">addr</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addr</span>
+
         <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s">&#39;get_irs&#39;</span><span class="p">:</span>
-            <span class="n">addr</span> <span class="o">+=</span> <span class="s">&#39;/get_irs/&#39;</span>
+            <span class="n">addr</span> <span class="o">+=</span> <span class="s">&#39;/irs/&#39;</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">text</span></div></div>
+        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="Network.get_leds"><a class="viewcode-back" href="../api.html#network.Network.get_leds">[docs]</a>    <span class="k">def</span> <span class="nf">get_leds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of the location of leds detected.</span>
+
+<span class="sd">        (e.g [{&#39;X&#39;: 10, &#39;Y&#39;: 20}, {&#39;X&#39;: 103, &#39;Y&#39;: 23}, {&#39;X&#39;: 111, &#39;Y&#39;: 203}, {&#39;X&#39;: 121, &#39;Y&#39;: 13}])</span>
+
+<span class="sd">        **Note:** If the location of a led is not detected, X and Y equal -1.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s">&#39;get_irs&#39;</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

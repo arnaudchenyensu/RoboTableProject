@@ -37,9 +37,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li><a href="../index.html">Robot Table 1.0 documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
@@ -61,9 +58,9 @@
     <span class="sd">&quot;&quot;&quot;Create a Wiimote object and</span>
 <span class="sd">    connect to the dongle USB.</span>
 
-<span class="sd">    :param width_resolution: Width resolution of the sensor</span>
-<span class="sd">    :param height_resolution: Height resolution of the sensor</span>
-<span class="sd">    :param test: Only use for test-driven</span>
+<span class="sd">    :param width_resolution: (optional) Width resolution of the sensor</span>
+<span class="sd">    :param height_resolution: (optional) Height resolution of the sensor</span>
+<span class="sd">    :param test: (optional) Only use for test-driven</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width_resolution</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">height_resolution</span><span class="o">=</span><span class="mi">768</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
@@ -102,7 +99,7 @@
 
 <span class="sd">        (e.g [{&#39;X&#39;: 10, &#39;Y&#39;: 20}, {&#39;X&#39;: 103, &#39;Y&#39;: 23}, {&#39;X&#39;: 111, &#39;Y&#39;: 203}, {&#39;X&#39;: 121, &#39;Y&#39;: 13}])</span>
 
-<span class="sd">        Note: If the location of a led is not detected, X and Y equal -1.</span>
+<span class="sd">        **Note:** If the location of a led is not detected, X and Y equal -1.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">global</span> <span class="n">wii</span>

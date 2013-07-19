@@ -5,6 +5,7 @@ class Robot(object):
     """This class represent a Robot with 3 leds (2 at the back and 1 at the front).
 
     :param sensor: Sensor that detect the infrared.
+    :param robot_drawing: (optional) RobotDrawing object.
 
     """
 
@@ -186,9 +187,9 @@ class RobotDrawing(object):
     """Create a RobotDrawing object, represented by 3 dots on the screen.
 
     :param canvas: Canvas of the application.
-    :param rad: Radius of the dots.
-    :param outline_color: Outline color of the dots.
-    :param fill_color: Fill color of the dots.
+    :param rad: (optional) Radius of the dots.
+    :param outline_color: (optional) Outline color of the dots.
+    :param fill_color: (optional) Fill color of the dots.
 
     """
     def __init__(self, canvas, rad=10, outline_color="red", fill_color="green"):
