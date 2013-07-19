@@ -27,7 +27,19 @@ class Network(object):
 
         if action == 'get_irs':
             addr += '/irs/'
+
+        if action == 'is_ready':
+            addr += '/is_ready/'
+
         r = requests.get(addr)
+        return r.json()
+
+    def post(self, action=None):
+        addr = self.addr
+        if action == 'servers_ready':
+            addr += '/servers_ready/'
+
+        r = requests.post(addr)
         return r.json()
 
     def get_leds(self):

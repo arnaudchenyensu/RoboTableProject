@@ -38,6 +38,7 @@ class Game(object):
         self.robot = robot
         self.sensor = robot.sensor
         self.remote_server_object = remote_server_object
+        self.ready = False
 
         self.x_factors = None
         self.y_factors = None
@@ -45,19 +46,19 @@ class Game(object):
         self.addr = self.get_addr()
         self.addr_main_server = addr_main_server
         self.addr_remote_servers = addr_remote_servers
-        self.servers = [self]
+        self.remote_servers = []
+        self.servers_ready = False
 
         self.remote = remote
-        if self.remote is False:
-            self._init_graphic()
-            self.robot.robot_drawing.canvas = self.canvas
-
         # Graphic variables. Initialized only if the method
         # self._init_graphic is called
         self.root = None
         self.screen_width = None
         self.screen_height = None
         self.canvas = None
+        if self.remote is False:
+            self._init_graphic()
+            self.robot.robot_drawing.canvas = self.canvas
 
     def is_main_server(self):
         """Return if the server is the main server."""
@@ -85,17 +86,17 @@ class Game(object):
 
     def _init_servers(self):
         """Create the remote servers' object and
-        append to the list self.servers.
+        append to the list self.remote_servers.
         """
         for addr_remote_server in self.addr_remote_servers:
             remote_server = copy.deepcopy(self.remote_server_object)
             remote_server.robot.sensor.addr = addr_remote_server
             remote_server.robot.robot_drawing.canvas = self.canvas
-            self.servers.append(remote_server)
+            self.remote_servers.append(remote_server)
 
     def draw_robots(self):
         """Draw robots on the table."""
-        for server in self.servers:
+        for server in self.remote_servers:
             robot = server.robot
             leds = robot.leds
             leds['front'] = self._apply_calibration_factors(leds['front'],
@@ -158,6 +159,8 @@ class Game(object):
 
         # Calibration
         self.x_factors, self.y_factors = self.do_calibration()
+        self._init_servers()
+        self.ready = True
 
         #debug
         # print "X factors:"
@@ -170,18 +173,45 @@ class Game(object):
         # print "beta: " + str(self.y_factors[1])
         # print "delta: " + str(self.y_factors[2])
 
+        if self.is_main_server():
+            self.synchronise_servers()
+        else:
+            self.wait_servers()
         # Define the width and height of a rectangle on the map,
         # and then create an array that represent the map
         self.rec_width = self.screen_width / 10
         self.rec_height = self.screen_height / 5
         self.board = self._create_board(5, 10)
 
-        self._init_servers()
         self.draw_robots()
         self.canvas.pack(fill=Tkinter.BOTH, expand=1)
 
         self.canvas.after(100, self._update_map)
         self.root.mainloop()
+
+    def wait_servers(self):
+        while self.servers_ready is False:
+            time.sleep(1)
+
+    def synchronise_servers(self):
+        print 'Waiting for the other servers...'
+        while self.servers_ready is False:
+            if self.is_servers_ready():
+                self.launch_games()
+                self.servers_ready = True
+            else:
+                time.sleep(1)
+        print 'Game launched.'
+
+    def launch_games(self):
+        for server in self.remote_servers:
+            server.sensor.post(action='servers_ready')
+
+    def is_servers_ready(self):
+        for server in self.remote_servers:
+            if server.sensor.get(action='is_ready') == 'False':
+                return False
+        return True
 
     def stop(self):
         """Stop the game."""

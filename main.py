@@ -15,7 +15,8 @@ robot2.sensor = network
 remote_server_object = Game(robot2, remote=True)
 
 
-g = Game(robot, remote_server_object=remote_server_object, addr_remote_servers=servers)
+g = Game(robot, remote_server_object=remote_server_object,
+         addr_main_server='10.4.9.11', addr_remote_servers=servers)
 path_img = 'RoboTableProject/img/temp5.jpg'
 g.load_map(path_img)
 g.start()
