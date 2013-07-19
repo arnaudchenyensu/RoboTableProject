@@ -18,8 +18,7 @@ class Game(object):
     :param robot: Robot object used on the table.
     :param remote_server_object: (optional) This object will be copied and used
         to simulate each other remote RoboTable.
-    :param addr_main_server: (optional) String representing the ip address
-        of the main RoboTable.
+    :param main_server: (optional) True if this is the main server.
     :param addr_remote_servers: (optional) A list containing the address
         of the other RoboTables.
     :param remote: (optional) If true, indicates that the object is a remote server.
@@ -32,7 +31,7 @@ class Game(object):
     """
     def __init__(self, robot,
                  remote_server_object=None,
-                 addr_main_server=None, addr_remote_servers=None,
+                 main_server=True, addr_remote_servers=None,
                  remote=False, name=None):
         self.name = name
         self.robot = robot
@@ -44,7 +43,7 @@ class Game(object):
         self.y_factors = None
 
         self.addr = self.get_addr()
-        self.addr_main_server = addr_main_server
+        self.main_server = main_server
         self.addr_remote_servers = addr_remote_servers
         self.remote_servers = []
         self.servers_ready = False
@@ -62,7 +61,7 @@ class Game(object):
 
     def is_main_server(self):
         """Return if the server is the main server."""
-        return self.addr_main_server == self.addr
+        return self.main_server
 
     def get_addr(self):
         """Return the ip address of the server.
