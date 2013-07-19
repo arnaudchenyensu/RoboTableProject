@@ -3,10 +3,13 @@ import mtTkinter as Tkinter
 import Image
 import ImageTk
 from robot import Robot
+from robot import RobotDrawing
+from network import Network
 import time
 import numpy
 import copy
-from network import Network
+import socket
+# from network import Network
 
 
 class Game(object):
@@ -19,26 +22,56 @@ class Game(object):
     :param servers: List containing the address of the other Robot Table.
 
     """
-    def __init__(self, sensor, network, name=None, test=False, servers=None):
-        self.network = network
+    def __init__(self, robot, remote_server_object=None, addr_main_server=None, addr_remote_servers=None, remote=False, name=None):
         self.name = name
-
-        if servers is None:
-            self.servers = []
-        else:
-            self.servers = servers
-
-        if test is False:
-            self.root = Tkinter.Tk()
-            self.screen_width, self.screen_height = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
-            self._set_full_screen()
-            self.sensor = sensor
-            self.robot = Robot(self.sensor)
-            self.canvas = Tkinter.Canvas(self.root)
-            self.robot_drawing = RobotDrawing(self.canvas)
+        self.robot = robot
+        self.sensor = robot.sensor
+        self.remote_server_object = remote_server_object
 
         self.x_factors = None
         self.y_factors = None
+
+        self.addr = self.get_addr()
+        self.addr_main_server = addr_main_server
+        self.addr_remote_servers = addr_remote_servers
+        self.servers = [self]
+
+        # if servers is None:
+        #     self.servers = []
+        # else:
+        #     self.servers = servers
+        self.remote = remote
+        if self.remote is False:
+            self._init_graphic()
+            self.robot.robot_drawing.canvas = self.canvas
+
+        # if test is False:
+            # self.robot = Robot(self.sensor, new_robot_drawing)
+            # self.robots = []
+            # self.robots.append(self.robot)
+            # self.robot_drawing = RobotDrawing(self.canvas)
+
+    def is_main_server(self):
+        return addr_main_server == addr
+
+    def get_addr(self):
+        """Return the ip address of the server.
+
+        Note: the solution was find here :
+        http://stackoverflow.com/questions/166506/finding-local-ip-addresses-using-pythons-stdlib
+
+        """
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("gmail.com", 80))
+        addr = s.getsockname()[0]
+        s.close()
+        return addr
+
+    def _init_graphic(self):
+        self.root = Tkinter.Tk()
+        self.screen_width, self.screen_height = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
+        self._set_full_screen()
+        self.canvas = Tkinter.Canvas(self.root)
 
     @property
     def robot_leds(self):
@@ -63,6 +96,40 @@ class Game(object):
                                                             self.x_factors,
                                                             self.y_factors)
             return leds
+
+    def _init_servers(self):
+        for addr_remote_server in self.addr_remote_servers:
+            remote_server = copy.deepcopy(self.remote_server_object)
+            remote_server.robot.sensor.addr = addr_remote_server
+            remote_server.robot.robot_drawing.canvas = self.canvas
+
+            # network = copy.deepcopy(self.network)
+            # network.addr = addr_remote_server
+            # robot = self._create_robot()
+            # remote_server = Game(network, robot, addr_main_server=None, sensor=None, remote=False, name=None):
+            self.servers.append(remote_server)
+
+    # def add_robots(self):
+    #     for server in self.servers:
+    #         new_robot_drawing = RobotDrawing(self.canvas)
+    #         network = Network(server)
+    #         new_robot = Robot(network, robot_drawing=new_robot_drawing)
+    #         self.robots.append(new_robot)
+
+    def draw_robots(self):
+        for server in self.servers:
+            robot = server.robot
+            leds = robot.leds
+            leds['front'] = self._apply_calibration_factors(leds['front'],
+                                                            self.x_factors,
+                                                            self.y_factors)
+            leds['left'] = self._apply_calibration_factors(leds['left'],
+                                                           self.x_factors,
+                                                           self.y_factors)
+            leds['right'] = self._apply_calibration_factors(leds['right'],
+                                                            self.x_factors,
+                                                            self.y_factors)
+            robot.draw(leds)
 
     def _apply_calibration_factors(self, led, x_factors, y_factors):
         """Return the led's location calibrated."""
@@ -125,9 +192,11 @@ class Game(object):
         # and then create an array that represent the map
         self.rec_width = self.screen_width / 10
         self.rec_height = self.screen_height / 5
-        self.board = self.create_board(5, 10)
+        self.board = self._create_board(5, 10)
 
-        self.robot_drawing.draw(self.robot_leds)
+        # self.robot_drawing.draw(self.robot_leds)
+        self._init_servers()
+        self.draw_robots()
         self.canvas.pack(fill=Tkinter.BOTH, expand=1)
 
         self.canvas.after(100, self._update_map)
@@ -279,8 +348,7 @@ class Game(object):
         #debug
         print leds
         #debug
-        for server in self.servers:
-            print self.network.get(server)
+        r = RobotDrawing(self.canvas)
 
         # Front led
         x1 = leds['front']['X']
@@ -297,11 +365,13 @@ class Game(object):
 
         # Update the drawing of the robot
         # self.robot_drawing.draw(leds, self.width_offset, self.height_offset)
-        self.robot_drawing.draw(leds)
+        # self.robot_drawing.draw(leds)
 
         #debug : I simulate the drawing of two other robots
-        self.robot_drawing.draw(leds)
-        self.robot_drawing.draw(leds)
+        # self.robot_drawing.draw(leds)
+        # self.robot_drawing.draw(leds)
+
+        self.draw_robots()
 
         #debug : the delay is shorter
         self.canvas.after(100, self._update_map)
@@ -400,50 +470,3 @@ class Crosshair(object):
         self.canvas.delete(self.circle)
         self.canvas.delete(self.horizontal_line)
         self.canvas.delete(self.vertical_line)
-
-
-class RobotDrawing(object):
-    """Create a RobotDrawing object, represented by 3 dots on the screen.
-
-    :param canvas: Canvas of the application.
-    :param rad: Radius of the dots.
-    :param outline_color: Outline color of the dots.
-    :param fill_color: Fill color of the dots.
-
-    """
-    def __init__(self, canvas, rad=10, outline_color="red", fill_color="green"):
-        self.canvas = canvas
-        self.rad = rad
-        self.outline_color = outline_color
-        self.fill_color = fill_color
-
-        # Represent the leds drawing on the canvas:
-        self._circle1 = None
-        self._circle2 = None
-        self._circle3 = None
-
-    def draw(self, leds):
-        """Draw three dots on the screen."""
-        # Front led
-        x1 = leds['front']['X']
-        y1 = leds['front']['Y']
-
-        # Left led
-        x2 = leds['left']['X']
-        y2 = leds['left']['Y']
-
-        # Right led
-        x3 = leds['right']['X']
-        y3 = leds['right']['Y']
-
-        if not self._circle1:
-            self._circle1 = self.canvas.create_oval(x1-self.rad, y1-self.rad, x1+self.rad, y1+self.rad,
-                                                    outline=self.outline_color, fill=self.fill_color, width=2)
-            self._circle2 = self.canvas.create_oval(x2-self.rad, y2-self.rad, x2+self.rad, y2+self.rad,
-                                                    outline=self.outline_color, fill=self.fill_color, width=2)
-            self._circle3 = self.canvas.create_oval(x3-self.rad, y3-self.rad, x3+self.rad, y3+self.rad,
-                                                    outline=self.outline_color, fill=self.fill_color, width=2)
-        else:
-            self.canvas.coords(self._circle1, x1-self.rad, y1-self.rad, x1+self.rad, y1+self.rad)
-            self.canvas.coords(self._circle2, x2-self.rad, y2-self.rad, x2+self.rad, y2+self.rad)
-            self.canvas.coords(self._circle3, x3-self.rad, y3-self.rad, x3+self.rad, y3+self.rad)

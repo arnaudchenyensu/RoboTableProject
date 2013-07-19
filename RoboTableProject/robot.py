@@ -8,11 +8,19 @@ class Robot(object):
 
     """
 
-    def __init__(self, sensor):
+    def __init__(self, sensor, robot_drawing=None):
         self.sensor = sensor
+        self.robot_drawing = robot_drawing
         self._front_led = {}
         self._back_left_led = {}
         self._back_right_led = {}
+
+    def draw(self, leds_calibrated):
+        if self.robot_drawing is None:
+            #TODO add exception
+            print 'No robot_drawing object'
+            return False
+        self.robot_drawing.draw(leds_calibrated)
 
     @property
     def leds(self):
@@ -29,8 +37,21 @@ class Robot(object):
 
         """
         leds_location = self.sensor.get_leds()
+        if self._is_ordered(leds_location):
+            return leds_location
+
         self._determine_led_position(leds_location[0], leds_location[1], leds_location[2])
         return {'front': self._front_led, 'left': self._back_left_led, 'right': self._back_right_led}
+
+    def _is_ordered(self, leds):
+        """Return if leds are already ordered
+        (e.g we already know what's the front led etc...).
+
+        Concretely, this is to know if we obtain the leds location from a sensor
+        or from the network.
+
+        """
+        return 'front' in leds
 
     @property
     def centre(self):
@@ -159,3 +180,50 @@ class Robot(object):
             return "D"
         #default: not change at all
         return "N"
+
+
+class RobotDrawing(object):
+    """Create a RobotDrawing object, represented by 3 dots on the screen.
+
+    :param canvas: Canvas of the application.
+    :param rad: Radius of the dots.
+    :param outline_color: Outline color of the dots.
+    :param fill_color: Fill color of the dots.
+
+    """
+    def __init__(self, canvas, rad=10, outline_color="red", fill_color="green"):
+        self.canvas = canvas
+        self.rad = rad
+        self.outline_color = outline_color
+        self.fill_color = fill_color
+
+        # Represent the leds drawing on the canvas:
+        self._circle1 = None
+        self._circle2 = None
+        self._circle3 = None
+
+    def draw(self, leds):
+        """Draw three dots on the screen."""
+        # Front led
+        x1 = leds['front']['X']
+        y1 = leds['front']['Y']
+
+        # Left led
+        x2 = leds['left']['X']
+        y2 = leds['left']['Y']
+
+        # Right led
+        x3 = leds['right']['X']
+        y3 = leds['right']['Y']
+
+        if not self._circle1:
+            self._circle1 = self.canvas.create_oval(x1-self.rad, y1-self.rad, x1+self.rad, y1+self.rad,
+                                                    outline=self.outline_color, fill=self.fill_color, width=2)
+            self._circle2 = self.canvas.create_oval(x2-self.rad, y2-self.rad, x2+self.rad, y2+self.rad,
+                                                    outline=self.outline_color, fill=self.fill_color, width=2)
+            self._circle3 = self.canvas.create_oval(x3-self.rad, y3-self.rad, x3+self.rad, y3+self.rad,
+                                                    outline=self.outline_color, fill=self.fill_color, width=2)
+        else:
+            self.canvas.coords(self._circle1, x1-self.rad, y1-self.rad, x1+self.rad, y1+self.rad)
+            self.canvas.coords(self._circle2, x2-self.rad, y2-self.rad, x2+self.rad, y2+self.rad)
+            self.canvas.coords(self._circle3, x3-self.rad, y3-self.rad, x3+self.rad, y3+self.rad)

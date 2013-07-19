@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import render_template
+from flask import json
 # import cwiid
 import time
 from game import Game
@@ -36,9 +37,9 @@ def launch():
 
     wiimote = Wiimote()
     network = Network()
-    servers = ['http://10.4.9.1:8001/', 'http://10.4.9.1:8002/']
+    servers = ['http://10.4.12.6:5000', 'http://10.4.12.6:5000']
     g = Game(wiimote, network, servers=servers)
-    path_img = '../temp5.jpg'
+    path_img = 'img/temp5.jpg'
     g.load_map(path_img)
     g.start()
 
@@ -54,7 +55,7 @@ def irs():
     global g
     # return HttpResponse(simplejson.dumps(irs()), mimetype='application/json')
     # return HttpResponse(simplejson.dumps(g.robot_leds), mimetype='application/json')
-    return g.robot_leds
+    return json.dumps(g.robot_leds)
 
 app.run(host='0.0.0.0')
 
