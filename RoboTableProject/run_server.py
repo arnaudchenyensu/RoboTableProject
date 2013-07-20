@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template
 from flask import json
+from flask import request
 # import cwiid
 import time
 from game import Game
@@ -53,9 +54,20 @@ def stop_game():
 @app.route("/irs/")
 def irs():
     global g
-    # return HttpResponse(simplejson.dumps(irs()), mimetype='application/json')
-    # return HttpResponse(simplejson.dumps(g.robot_leds), mimetype='application/json')
     return json.dumps(g.robot_leds)
+
+
+@app.route("/is_ready/")
+def is_ready():
+    return json.dumps('True')
+
+
+@app.route("/servers_ready/", methods=['GET', 'POST'])
+def servers():
+    global g
+    if request.method == 'POST':
+        g.servers_ready = 'True'
+    return json.dumps(g.servers_ready)
 
 app.run(host='0.0.0.0')
 
