@@ -43,17 +43,21 @@ class GUI(object):
         crosshair.draw()
         return crosshair
 
-    def create_oval(self, x, y, rad, outline_color="red", width=2):
-        oval = self.canvas.create_oval(x-rad, y-rad,
-                                       x+rad, y+rad,
-                                       outline=outline_color, width=width)
+    def get_robot_drawing(self, rad=10, outline_color="red", fill_color="green"):
+        return RobotDrawing(self, rad, outline_color, fill_color)
+
+    def draw_circle(self, x, y, rad, outline_color="red", width=2, fill_color=None):
+        circle = self.canvas.create_oval(x-rad, y-rad,
+                                         x+rad, y+rad,
+                                         outline=outline_color, width=width,
+                                         fill=fill_color)
         self.root.after(100, self.root.quit)
         self.root.mainloop()
-        return oval
+        return circle
 
-    def create_line(self, x_origin, y_origin,
-                          x_end, y_end,
-                          fill_color="red", width=2):
+    def draw_line(self, x_origin, y_origin,
+                        x_end, y_end,
+                        fill_color="red", width=2):
         line = self.canvas.create_line(x_origin, y_origin,
                                        x_end, y_end,
                                        width=width, fill=fill_color)
@@ -61,7 +65,23 @@ class GUI(object):
         self.root.mainloop()
         return line
 
+    def coords(self, object_id, *coords):
+        """Change and return the coordinates of the object.
+
+        :param object_id: Id of the object.
+        :param *coords: (optional) List of coordinate pairs.
+
+        **Note:** Same effect as the `Tkinter's method <http://goo.gl/1PMqtC>`_.
+
+        """
+        return self.canvas.coords(object_id, *coords)
+
     def delete(self, object_id):
+        """Delete the object with the id object_id.
+
+        :param object_id: Id's object.
+
+        """
         self.canvas.delete(object_id)
 
 class Crosshair(object):
@@ -93,25 +113,80 @@ class Crosshair(object):
         # is not drawn somewhere else
         if self.circle is not None:
             self.delete
-        self._create_oval()
-        self._create_cross()
+        self._draw_circle()
+        self._draw_cross()
 
-    def _create_oval(self):
-        """Draw an oval."""
-        self.circle = self.gui.create_oval(self.x, self.y, self.rad,
+    def _draw_circle(self):
+        """Draw an circle."""
+        self.circle = self.gui.draw_circle(self.x, self.y, self.rad,
                                            outline_color=self.color, width=self.width)
 
-    def _create_cross(self):
+    def _draw_cross(self):
         """Draw a cross."""
-        self.horizontal_line = self.gui.create_line(self.x-self.rad, self.y,
-                                                    self.x+self.rad, self.y,
-                                                    width=2, fill_color=self.color)
-        self.vertical_line = self.gui.create_line(self.x, self.y-self.rad,
-                                                  self.x, self.y+self.rad,
+        self.horizontal_line = self.gui.draw_line(self.x-self.rad, self.y,
+                                                  self.x+self.rad, self.y,
                                                   width=2, fill_color=self.color)
+        self.vertical_line = self.gui.draw_line(self.x, self.y-self.rad,
+                                                self.x, self.y+self.rad,
+                                                width=2, fill_color=self.color)
 
     def delete(self):
         """Delete the crosshair on the canvas."""
         self.gui.delete(self.circle)
         self.gui.delete(self.horizontal_line)
         self.gui.delete(self.vertical_line)
+
+class RobotDrawing(object):
+    """Create a RobotDrawing object, represented by 3 dots on the screen.
+
+    :param gui: GUI object.
+    :param rad: (optional) Radius of the dots.
+    :param outline_color: (optional) Outline color of the dots.
+    :param fill_color: (optional) Fill color of the dots.
+
+    """
+    def __init__(self, gui, rad=10, outline_color="red", fill_color="green"):
+        self.gui = gui
+        self.rad = rad
+        self.outline_color = outline_color
+        self.fill_color = fill_color
+
+        # Represent the leds drawing on the canvas:
+        self._circle1 = None
+        self._circle2 = None
+        self._circle3 = None
+
+    def draw(self, leds):
+        """Draw three dots on the screen."""
+        # Front led
+        x1 = leds['front']['X']
+        y1 = leds['front']['Y']
+
+        # Left led
+        x2 = leds['left']['X']
+        y2 = leds['left']['Y']
+
+        # Right led
+        x3 = leds['right']['X']
+        y3 = leds['right']['Y']
+
+        # If circles are not already drawn
+        if not self._circle1:
+            self._circle1 = self.gui.draw_circle(x1, y1, self.rad,
+                                                 outline_color=self.outline_color,
+                                                 fill_color=self.fill_color, width=2)
+            self._circle2 = self.gui.draw_circle(x2, y2, self.rad,
+                                                 outline_color=self.outline_color,
+                                                 fill_color=self.fill_color, width=2)
+            self._circle3 = self.gui.draw_circle(x3, y3, self.rad,
+                                                 outline_color=self.outline_color,
+                                                 fill_color=self.fill_color, width=2)
+        else:
+            self.gui.coords(self._circle1, x1-self.rad, y1-self.rad, x1+self.rad, y1+self.rad)
+            self.gui.coords(self._circle2, x2-self.rad, y2-self.rad, x2+self.rad, y2+self.rad)
+            self.gui.coords(self._circle3, x3-self.rad, y3-self.rad, x3+self.rad, y3+self.rad)
+
+    def delete(self):
+        self.gui.delete(self._circle1)
+        self.gui.delete(self._circle2)
+        self.gui.delete(self._circle3)

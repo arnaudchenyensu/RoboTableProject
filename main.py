@@ -2,7 +2,6 @@ from RoboTableProject.game import Game
 from RoboTableProject.game import GameManagement
 from RoboTableProject.wiimote import Wiimote
 from RoboTableProject.robot import Robot
-from RoboTableProject.robot import RobotDrawing
 from RoboTableProject.network import Network
 from RoboTableProject.graphic import GUI
 import copy
@@ -13,9 +12,8 @@ network = Network()
 gui = GUI()
 game_management = GameManagement(wiimote, gui)
 servers = ['http://10.4.9.1:5000', 'http://10.4.9.1:5000']
-robot = Robot(wiimote, robot_drawing=RobotDrawing(None))
-robot2 = copy.deepcopy(robot)
-robot2.sensor = network
+robot = Robot(wiimote, gui=gui)
+robot2 = Robot(network)
 remote_server_object = Game(robot2, remote=True)
 
 

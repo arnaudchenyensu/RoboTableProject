@@ -9,9 +9,13 @@ class Robot(object):
 
     """
 
-    def __init__(self, sensor, robot_drawing=None):
+    def __init__(self, sensor, gui=None):
         self.sensor = sensor
-        self.robot_drawing = robot_drawing
+        self.gui = gui
+        if self.gui is not None:
+            self.robot_drawing = self.gui.get_robot_drawing()
+        else:
+            self.robot_drawing = None
         self._front_led = {}
         self._back_left_led = {}
         self._back_right_led = {}
@@ -181,50 +185,3 @@ class Robot(object):
             return "D"
         #default: not change at all
         return "N"
-
-
-class RobotDrawing(object):
-    """Create a RobotDrawing object, represented by 3 dots on the screen.
-
-    :param canvas: Canvas of the application.
-    :param rad: (optional) Radius of the dots.
-    :param outline_color: (optional) Outline color of the dots.
-    :param fill_color: (optional) Fill color of the dots.
-
-    """
-    def __init__(self, canvas, rad=10, outline_color="red", fill_color="green"):
-        self.canvas = canvas
-        self.rad = rad
-        self.outline_color = outline_color
-        self.fill_color = fill_color
-
-        # Represent the leds drawing on the canvas:
-        self._circle1 = None
-        self._circle2 = None
-        self._circle3 = None
-
-    def draw(self, leds):
-        """Draw three dots on the screen."""
-        # Front led
-        x1 = leds['front']['X']
-        y1 = leds['front']['Y']
-
-        # Left led
-        x2 = leds['left']['X']
-        y2 = leds['left']['Y']
-
-        # Right led
-        x3 = leds['right']['X']
-        y3 = leds['right']['Y']
-
-        if not self._circle1:
-            self._circle1 = self.canvas.create_oval(x1-self.rad, y1-self.rad, x1+self.rad, y1+self.rad,
-                                                    outline=self.outline_color, fill=self.fill_color, width=2)
-            self._circle2 = self.canvas.create_oval(x2-self.rad, y2-self.rad, x2+self.rad, y2+self.rad,
-                                                    outline=self.outline_color, fill=self.fill_color, width=2)
-            self._circle3 = self.canvas.create_oval(x3-self.rad, y3-self.rad, x3+self.rad, y3+self.rad,
-                                                    outline=self.outline_color, fill=self.fill_color, width=2)
-        else:
-            self.canvas.coords(self._circle1, x1-self.rad, y1-self.rad, x1+self.rad, y1+self.rad)
-            self.canvas.coords(self._circle2, x2-self.rad, y2-self.rad, x2+self.rad, y2+self.rad)
-            self.canvas.coords(self._circle3, x3-self.rad, y3-self.rad, x3+self.rad, y3+self.rad)
