@@ -23,7 +23,7 @@ class Game(object):
     remote_server_object (but have to be provided if remote=false).
 
     """
-    def __init__(self, robot, game_management,
+    def __init__(self, robot, gui=None, game_management=None,
                  remote_server_object=None,
                  main_server=True, addr_remote_servers=None,
                  remote=False, name=None):
@@ -46,10 +46,16 @@ class Game(object):
         self.remote = remote
         # Graphic variables. Initialized only if the method
         # self._init_graphic is called
-        self.root = None
-        self.screen_width = None
-        self.screen_height = None
-        self.canvas = None
+        self.gui = gui
+        if self.gui is not None:
+            self.root = self.gui.root
+            self.screen_width = self.gui.screen_width
+            self.screen_height = self.gui.screen_height
+            self.canvas = self.gui.canvas
+            self.robot.robot_drawing.canvas = self.canvas
+
+    def load_map(self, path):
+        self.gui.load_map(path)
 
     def is_main_server(self):
         """Return if the server is the main server."""
@@ -108,6 +114,8 @@ class Game(object):
         """
 
         self.game_management.start()
+        self.x_factors = self.game_management.x_factors
+        self.y_factors = self.game_management.y_factors
         #debug
         # print "Width " + str(self.screen_width)
         # print "height " + str(self.screen_height)
@@ -129,7 +137,19 @@ class Game(object):
         self.rec_height = self.screen_height / 5
         self.board = self._create_board(5, 10)
 
-        self.draw_robots()
+        leds = self.robot.leds
+        leds['front'] = self._apply_calibration_factors(leds['front'],
+                                                        self.x_factors,
+                                                        self.y_factors)
+        leds['left'] = self._apply_calibration_factors(leds['left'],
+                                                       self.x_factors,
+                                                       self.y_factors)
+        leds['right'] = self._apply_calibration_factors(leds['right'],
+                                                        self.x_factors,
+                                                        self.y_factors)
+        self.robot.draw(leds)
+
+        # self.draw_robots()
         self.canvas.pack(fill=Tkinter.BOTH, expand=1)
 
         self.canvas.after(100, self._update_map)
@@ -144,6 +164,18 @@ class Game(object):
         draw rectangles when needed.
 
         """
+        #debug
+        leds = self.robot.leds
+        leds['front'] = self._apply_calibration_factors(leds['front'],
+                                                        self.x_factors,
+                                                        self.y_factors)
+        leds['left'] = self._apply_calibration_factors(leds['left'],
+                                                       self.x_factors,
+                                                       self.y_factors)
+        leds['right'] = self._apply_calibration_factors(leds['right'],
+                                                        self.x_factors,
+                                                        self.y_factors)
+        self.robot.draw(leds)
 
         # if self._is_led_on_screen(x1, y1):
         #     num_column = int(x1 / self.rec_width)
@@ -178,6 +210,10 @@ class GameManagement(object):
     def __init__(self, sensor, gui, main_server=True):
         self.main_server = main_server
         self.gui = gui
+        # self.canvas = self.gui.canvas
+        # self.root = self.gui.root
+        self.screen_width = self.gui.screen_width
+        self.screen_height = self.gui.screen_height
         self.sensor = sensor
         self._x_factors = None
         self._y_factors = None
@@ -187,17 +223,17 @@ class GameManagement(object):
         if self._x_factors is None:
             #TODO Add exception
             print "The calibration was not done"
-        return self.x_factors
+        return self._x_factors
 
     @property
     def y_factors(self):
         if self._y_factors is None:
             #TODO Add exception
             print "The calibration was not done"
-        return self.y_factors
+        return self._y_factors
 
     def start(self):
-        self.gui.init_graphic()
+        # self.gui.init_graphic()
         # Calibration
         self._x_factors, self._y_factors = self.do_calibration()
         # self.send_addr_remote_to_remote()
@@ -210,7 +246,7 @@ class GameManagement(object):
 
         # if self.remote is False:
         #     self._init_graphic()
-        self.robot.robot_drawing.canvas = self.canvas
+        # self.robot.robot_drawing.canvas = self.canvas
 
     def launch_games(self):
         for server in self.remote_servers:
@@ -337,35 +373,23 @@ class GameManagement(object):
         # Top left crosshair
         x_crosshair = offset
         y_crosshair = offset
-        crosshair = Crosshair(self.root, self.canvas, x_crosshair, y_crosshair)
-        top_left_led = crosshair.get_led(self.sensor)
+        top_left_led = self._get_led_crosshair(x_crosshair, y_crosshair)
         x1_screen, y1_screen = x_crosshair, y_crosshair
         x1_wiimote, y1_wiimote = top_left_led['X'], top_left_led['Y']
-        #debug
-        # print "Screen: X: " + str(x1_screen) + " Y: " + str(y1_screen)
-        # print "Wiimote: X: " + str(x1_wiimote) + " Y: " + str(y1_wiimote)
 
         # Bottom left crosshair
         x_crosshair = offset
         y_crosshair = self.screen_height - offset
-        crosshair = Crosshair(self.root, self.canvas, x_crosshair, y_crosshair)
-        bottom_left_led = crosshair.get_led(self.sensor)
+        bottom_left_led = self._get_led_crosshair(x_crosshair, y_crosshair)
         x2_screen, y2_screen = x_crosshair, y_crosshair
         x2_wiimote, y2_wiimote = bottom_left_led['X'], bottom_left_led['Y']
-        #debug
-        # print "Screen: X: " + str(x2_screen) + " Y: " + str(y2_screen)
-        # print "Wiimote: X: " + str(x2_wiimote) + " Y: " + str(y2_wiimote)
 
         # Third crosshair
         x_crosshair = self.screen_width - offset*10
         y_crosshair = self.screen_height / 2.
-        crosshair = Crosshair(self.root, self.canvas, x_crosshair, y_crosshair)
-        mid_right_led = crosshair.get_led(self.sensor)
+        mid_right_led = self._get_led_crosshair(x_crosshair, y_crosshair)
         x3_screen, y3_screen = x_crosshair, y_crosshair
         x3_wiimote, y3_wiimote = mid_right_led['X'], mid_right_led['Y']
-        #debug
-        # print "Screen: X: " + str(x3_screen) + " Y: " + str(y3_screen)
-        # print "Wiimote: X: " + str(x3_wiimote) + " Y: " + str(y3_wiimote)
 
         leds_location_screen = [[x1_screen, y1_screen],
                                 [x2_screen, y2_screen],
@@ -379,82 +403,19 @@ class GameManagement(object):
                                            leds_location_wiimote))
 
 
-class Crosshair(object):
-    """Create a Crosshair object.
-
-    :param root: Main window of the application.
-    :param canvas: Canvas of the application.
-    :param x: x location of the Crosshair.
-    :param y: y location of the Crosshair.
-    :param rad: (optional) Crosshair's radius.
-    :param color: (optional) Crosshair's color.
-
-    """
-    def __init__(self, gui, x, y, rad=30, color="red"):
-        super(Crosshair, self).__init__()
-        self.gui = gui
-        self.root = self.gui.root
-        self.canvas = self.gui.canvas
-        self.x = x
-        self.y = y
-        self.rad = rad
-        self.color = color
-        self.circle = None
-        self.horizontal_line = None
-        self.vertical_line = None
-
-    def get_led(self, sensor):
-        """Draw a crosshair, set and return the location of the led."""
-        self.sensor = sensor
-        self.draw()
-        self.canvas.after(500, self._get_led)
-        self.canvas.pack(fill=Tkinter.BOTH, expand=1)
-        self.root.mainloop()
-        return self.led
+    def _get_led_crosshair(self, x, y):
+        """Draw a crosshair and return the location of the led."""
+        crosshair = self.gui.draw_crosshair(x, y)
+        led = self._get_led()
+        crosshair.delete()
+        return led
 
     def _get_led(self):
-        """This method wait until a led is detected,
-        then set self.led = led.
-
-        Confusing because of the way Tkinter works.
-
-        """
+        """When a led is detected, return its location."""
         leds = self.sensor.get_leds()
         led = leds[0]
         while led['X'] == -1:
             time.sleep(0.5)
             leds = self.sensor.get_leds()
             led = leds[0]
-        self.delete()
-        self.root.quit()
-        self.led = led
-
-    def draw(self):
-        """Draw the Crosshair on the screen."""
-        # Before drawing, we make sure that the crosshair
-        # is not drawn somewhere else
-        if self.circle is not None:
-            self.delete
-        self._create_oval()
-        self._create_cross()
-
-    def _create_oval(self):
-        """Draw an oval."""
-        self.circle = self.canvas.create_oval(self.x-self.rad, self.y-self.rad,
-                                              self.x+self.rad, self.y+self.rad,
-                                              outline=self.color, width=2)
-
-    def _create_cross(self):
-        """Draw a cross."""
-        self.horizontal_line = self.canvas.create_line(self.x-self.rad, self.y,
-                                                       self.x+self.rad, self.y,
-                                                       width=2, fill=self.color)
-        self.vertical_line = self.canvas.create_line(self.x, self.y-self.rad,
-                                                     self.x, self.y+self.rad,
-                                                     width=2, fill=self.color)
-
-    def delete(self):
-        """Delete the crosshair on the canvas."""
-        self.canvas.delete(self.circle)
-        self.canvas.delete(self.horizontal_line)
-        self.canvas.delete(self.vertical_line)
+        return led
