@@ -10,6 +10,7 @@ class Game(object):
     """Create a game.
 
     :param robot: Robot object used on the table.
+    :param gui: (optional) GUI object.
     :param remote_server_object: (optional) This object will be copied and used
         to simulate each other remote RoboTable.
     :param main_server: (optional) True if this is the main server.
@@ -210,8 +211,6 @@ class GameManagement(object):
     def __init__(self, sensor, gui, main_server=True):
         self.main_server = main_server
         self.gui = gui
-        # self.canvas = self.gui.canvas
-        # self.root = self.gui.root
         self.screen_width = self.gui.screen_width
         self.screen_height = self.gui.screen_height
         self.sensor = sensor
@@ -233,7 +232,6 @@ class GameManagement(object):
         return self._y_factors
 
     def start(self):
-        # self.gui.init_graphic()
         # Calibration
         self._x_factors, self._y_factors = self.do_calibration()
         # self.send_addr_remote_to_remote()
