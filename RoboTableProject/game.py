@@ -4,6 +4,8 @@ import time
 import numpy
 import copy
 import socket
+import math
+import numpy
 
 
 class Game(object):
@@ -362,6 +364,72 @@ class GameManagement(object):
 
         return x_factors, y_factors
 
+    def _calculate_calibration_n(self, leds_location_screen,
+                               leds_location_wiimote):
+        """Voir equation (10)"""
+        if len(leds_location_wiimote) != len(leds_location_screen):
+            #TODO add throw exception
+            print 'The two list have not the same length'
+        else:
+            n = len(leds_location_wiimote)
+
+        x_k = copy.deepcopy(leds_location_screen)
+        for i in range(n):
+            x_k[i] = x_k[i][0]
+        x_k = numpy.array(x_k)
+
+        y_k = copy.deepcopy(leds_location_screen)
+        for i in range(n):
+            y_k[i] = y_k[i][1]
+        y_k = numpy.array(y_k)
+
+        x_prime_k = copy.deepcopy(leds_location_wiimote)
+        for i in range(n):
+            x_prime_k[i] = x_prime_k[i][0]
+        x_prime_k = numpy.array(x_prime_k)
+
+        y_prime_k = copy.deepcopy(leds_location_wiimote)
+        for i in range(n):
+            y_prime_k[i] = y_prime_k[i][1]
+        y_prime_k = numpy.array(y_prime_k)
+
+        a = math.fsum(x_prime_k**2)
+        b = math.fsum(y_prime_k**2)
+        c = math.fsum(x_prime_k * y_prime_k)
+        d = math.fsum(x_prime_k)
+        e = math.fsum(y_prime_k)
+
+        X_1 = math.fsum(x_prime_k * x_k)
+        X_2 = math.fsum(y_prime_k * x_k)
+        X_3 = math.fsum(x_k)
+
+        Y_1 = math.fsum(x_prime_k * y_k)
+        Y_2 = math.fsum(y_prime_k * y_k)
+        Y_3 = math.fsum(y_k)
+
+        delta = n * (a*b-c**2) + 2*c*d*e - a*e**2 - b*d**2
+        delta_x1 = n * (X_1*b-X_2*c) + e * (X_2*d-X_1*e) + X_3 * (c*e-b*d)
+        delta_x2 = n * (X_2*a-X_1*c) + d * (X_1*e-X_2*d) + X_3 * (c*d-a*e)
+        delta_x3 = X_3 * (a*b-c**2) + X_1 * (c*e-b*d) + X_2 * (c*d-a*e)
+
+        delta_y1 = n * (Y_1*b-Y_2*c) + e * (Y_2*d-Y_1*e) + Y_3 * (c*e-b*d)
+        delta_y2 = n * (Y_2*a-Y_1*c) + d * (Y_1*e-Y_2*d) + Y_3 * (c*d-a*e)
+        delta_y3 = Y_3 * (a*b-c**2) + Y_1 * (c*e-b*d) + Y_2 * (c*d-a*e)
+
+        alpha_x = delta_x1 / delta
+        beta_x = delta_x2 / delta
+        delta_x = delta_x3 / delta
+
+        alpha_y = delta_y1 / delta
+        beta_y = delta_y2 / delta
+        delta_y = delta_y3 / delta
+
+        x_factors = [alpha_x, beta_x, delta_x]
+        y_factors = [alpha_y, beta_y, delta_y]
+
+        return x_factors, y_factors
+
+
     def do_calibration(self):
         """Draw three crosshairs and then return the calibration's factors
         (x_factors and y_factors) using the _calculate_calibration method.
@@ -382,22 +450,40 @@ class GameManagement(object):
         x2_screen, y2_screen = x_crosshair, y_crosshair
         x2_wiimote, y2_wiimote = bottom_left_led['X'], bottom_left_led['Y']
 
-        # Third crosshair
-        x_crosshair = self.screen_width - offset*10
-        y_crosshair = self.screen_height / 2.
-        mid_right_led = self._get_led_crosshair(x_crosshair, y_crosshair)
+        # Top right crosshair
+        x_crosshair = self.screen_width - offset
+        y_crosshair = offset
+        top_right_led = self._get_led_crosshair(x_crosshair, y_crosshair)
         x3_screen, y3_screen = x_crosshair, y_crosshair
-        x3_wiimote, y3_wiimote = mid_right_led['X'], mid_right_led['Y']
+        x3_wiimote, y3_wiimote = top_right_led['X'], top_right_led['Y']
+
+        # Bottom right crosshair
+        x_crosshair = self.screen_width - offset
+        y_crosshair = self.screen_height - offset
+        bottom_right_led = self._get_led_crosshair(x_crosshair, y_crosshair)
+        x4_screen, y4_screen = x_crosshair, y_crosshair
+        x4_wiimote, y4_wiimote = bottom_right_led['X'], bottom_right_led['Y']
+
+        # Middle crosshair
+        x_crosshair = self.screen_width / 2.
+        y_crosshair = self.screen_height / 2.
+        middle_led = self._get_led_crosshair(x_crosshair, y_crosshair)
+        x5_screen, y5_screen = x_crosshair, y_crosshair
+        x5_wiimote, y5_wiimote = middle_led['X'], middle_led['Y']
 
         leds_location_screen = [[x1_screen, y1_screen],
                                 [x2_screen, y2_screen],
-                                [x3_screen, y3_screen]]
+                                [x3_screen, y3_screen],
+                                [x4_screen, y4_screen],
+                                [x5_screen, y5_screen]]
 
-        leds_location_wiimote = [[x1_wiimote, self.sensor.height_resolution-y1_wiimote],
-                                 [x2_wiimote, self.sensor.height_resolution-y2_wiimote],
-                                 [x3_wiimote, self.sensor.height_resolution-y3_wiimote]]
+        leds_location_wiimote = [[x1_wiimote, self.sensor.height_resolution - y1_wiimote],
+                                 [x2_wiimote, self.sensor.height_resolution - y2_wiimote],
+                                 [x3_wiimote, self.sensor.height_resolution - y3_wiimote],
+                                 [x4_wiimote, self.sensor.height_resolution - y4_wiimote],
+                                 [x5_wiimote, self.sensor.height_resolution - y5_wiimote]]
 
-        return(self._calculate_calibration(leds_location_screen,
+        return(self._calculate_calibration_n(leds_location_screen,
                                            leds_location_wiimote))
 
 
