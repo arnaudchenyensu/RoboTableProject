@@ -36,6 +36,7 @@ class Game(object):
         self.game_management = game_management
         self.remote_server_object = remote_server_object
         self.ready = False
+        self.robots = []
 
         self.x_factors = None
         self.y_factors = None
@@ -44,11 +45,9 @@ class Game(object):
         self.main_server = main_server
         self.addr_remote_servers = addr_remote_servers
         self.remote_servers = []
-        self.servers_ready = False
 
         self.remote = remote
-        # Graphic variables. Initialized only if the method
-        # self._init_graphic is called
+        # Graphic variables.
         self.gui = gui
         if self.gui is not None:
             self.root = self.gui.root
@@ -78,6 +77,8 @@ class Game(object):
 
     def draw_robots(self):
         """Draw robots on the table."""
+        if len(self.robots) == 0:
+            pass
         for server in self.remote_servers:
             robot = server.robot
             leds = robot.leds
@@ -116,7 +117,8 @@ class Game(object):
 
         """
 
-        self.game_management.start()
+        # Pause of 10s, the time to have the address of all the servers
+        self.game_management.start(self.main_server, self.get_addr())
         self.x_factors = self.game_management.x_factors
         self.y_factors = self.game_management.y_factors
         #debug
@@ -210,14 +212,18 @@ class Game(object):
 
 class GameManagement(object):
     """docstring for GameManagement"""
-    def __init__(self, sensor, gui, main_server=True):
-        self.main_server = main_server
+    def __init__(self, sensor, gui, network, nb_servers):
+        self.sensor = sensor
         self.gui = gui
         self.screen_width = self.gui.screen_width
         self.screen_height = self.gui.screen_height
-        self.sensor = sensor
+        self.network = network
         self._x_factors = None
         self._y_factors = None
+
+        self.addr_servers = []
+        self.nb_servers = nb_servers
+        self.servers_ready = False
 
     @property
     def x_factors(self):
@@ -233,9 +239,21 @@ class GameManagement(object):
             print "The calibration was not done"
         return self._y_factors
 
-    def start(self):
-        # Calibration
-        self._x_factors, self._y_factors = self.do_calibration()
+    def start(self, main_server, addr):
+        # addr = 'http://' + addr + ':5000'
+        addr = 'http://10.4.9.7:5000'
+        if main_server:
+            self.addr_servers.append(addr)
+            self.wait_addr_servers()
+            self._x_factors, self._y_factors = self.do_calibration()
+            self.send_addr_servers()
+            self.synchronise_servers()
+        else:
+            self.send_addr_to_main_server(addr)
+            self._x_factors, self._y_factors = self.do_calibration()
+            self.wait_servers()
+
+
         # self.send_addr_remote_to_remote()
         # self._init_servers()
         # self.ready = True
@@ -248,19 +266,29 @@ class GameManagement(object):
         #     self._init_graphic()
         # self.robot.robot_drawing.canvas = self.canvas
 
-    def launch_games(self):
-        for server in self.remote_servers:
-            server.sensor.post(action='servers_ready')
+    def send_addr_servers(self):
+        for addr in self.addr_servers[1:]:
+            #debug
+            print addr
+            self.network.send_addr_servers(addr, self.addr_servers)
 
-    def _init_servers(self):
-        """Create the remote servers' object and
-        append to the list self.remote_servers.
-        """
-        for addr_remote_server in self.addr_remote_servers:
-            remote_server = copy.deepcopy(self.remote_server_object)
-            remote_server.robot.sensor.addr = addr_remote_server
-            remote_server.robot.robot_drawing.canvas = self.canvas
-            self.remote_servers.append(remote_server)
+    def wait_addr_servers(self):
+        while len(self.addr_servers) != self.nb_servers:
+            time.sleep(1)
+
+    def launch_game(self):
+        for addr in self.addr_servers[1:]:
+            self.network.launch(addr)
+
+    # def _init_servers(self):
+    #     """Create the remote servers' object and
+    #     append to the list self.remote_servers.
+    #     """
+    #     for addr_remote_server in self.addr_remote_servers:
+    #         remote_server = copy.deepcopy(self.remote_server_object)
+    #         remote_server.robot.sensor.addr = addr_remote_server
+    #         remote_server.robot.robot_drawing.canvas = self.canvas
+    #         self.remote_servers.append(remote_server)
 
     def wait_servers(self):
         while self.servers_ready is False:
@@ -270,15 +298,15 @@ class GameManagement(object):
         print 'Waiting for the other servers...'
         while self.servers_ready is False:
             if self.is_servers_ready():
-                self.launch_games()
+                self.launch_game()
                 self.servers_ready = True
             else:
                 time.sleep(1)
         print 'Game launched.'
 
     def is_servers_ready(self):
-        for server in self.remote_servers:
-            if server.sensor.get(action='is_ready') == 'False':
+        for addr_server in self.addr_servers:
+            if  self.network.is_ready == 'False':
                 return False
         return True
 

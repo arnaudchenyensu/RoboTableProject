@@ -4,14 +4,13 @@ from RoboTableProject.wiimote import Wiimote
 from RoboTableProject.robot import Robot
 from RoboTableProject.network import Network
 from RoboTableProject.graphic import GUI
-import copy
 
 # This file is only use to make test on the Robot Table
 wiimote = Wiimote()
 network = Network()
 gui = GUI()
-game_management = GameManagement(wiimote, gui)
-servers = ['http://10.4.9.1:5000', 'http://10.4.9.1:5000']
+game_management = GameManagement(wiimote, gui, network, 2)
+servers = ['http://10.4.9.4:5000', 'http://10.4.9.1:5000']
 robot = Robot(wiimote, gui=gui)
 robot2 = Robot(network)
 remote_server_object = Game(robot2, remote=True)
