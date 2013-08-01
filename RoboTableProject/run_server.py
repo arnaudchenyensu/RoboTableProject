@@ -52,7 +52,7 @@ def launch():
     remote_server_object = Game(robot2, remote=True)
 
 
-    game = Game(robot, gui=gui, game_management=game_management, remote_server_object=remote_server_object,
+    game = Game(robot, network=network, gui=gui, game_management=game_management, remote_server_object=remote_server_object,
              main_server=True, addr_remote_servers=servers)
     path_img = 'RoboTableProject/img/temp5.jpg'
     game.load_map(path_img)
@@ -68,7 +68,7 @@ def stop_game():
 @app.route("/irs/")
 def irs():
     global game
-    return json.dumps(game.robot_leds)
+    return json.dumps(game.robot.leds)
 
 
 @app.route("/is_ready/")
@@ -87,12 +87,20 @@ def servers_ready():
 def servers():
     global game_management
     if request.method == 'POST':
-        game_management.addr_servers.append(request.get_data())
+        game_management.servers = json.loads(request.get_data())
         return json.dumps('True')
-    return json.dumps(game_management.addr_servers)
+    return json.dumps(game_management.servers)
+
+@app.route("/servers/new", methods=['POST'])
+def new_server():
+    global game_management
+    if request.method == 'POST':
+        game_management.servers.append(json.loads(request.get_data()))
+        return json.dumps('True')
+    return json.dumps('False')
 
 @app.route("/launch/", methods=['POST'])
-def launch():
+def launch_game():
     global game_management
     game_management.servers_ready = True
     return json.dumps('True')

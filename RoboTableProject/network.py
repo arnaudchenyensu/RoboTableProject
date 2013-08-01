@@ -24,10 +24,16 @@ class Network(object):
         return r.json()
 
     def send_addr_servers(self, addr, addr_servers):
+        pass
+        # addr += '/servers/'
+        # print 'Network.py:'
+        # print addr
+        # r = requests.post(addr, data=json.dumps(addr_servers))
+        # return r.json()
+
+    def send_list_servers(self, addr, list_servers):
         addr += '/servers/'
-        print 'Network.py:'
-        print addr
-        r = requests.post(addr, data=json.dumps(addr_servers))
+        r = requests.post(addr, data=json.dumps(list_servers))
         return r.json()
 
     # def get_leds(self):

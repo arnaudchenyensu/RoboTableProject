@@ -26,7 +26,7 @@ class Game(object):
     remote_server_object (but have to be provided if remote=false).
 
     """
-    def __init__(self, robot, gui=None, game_management=None,
+    def __init__(self, robot, network=None, gui=None, game_management=None,
                  remote_server_object=None,
                  main_server=True, addr_remote_servers=None,
                  remote=False, name=None):
@@ -37,6 +37,7 @@ class Game(object):
         self.remote_server_object = remote_server_object
         self.ready = False
         self.robots = []
+        self.network = network
 
         self.x_factors = None
         self.y_factors = None
@@ -44,7 +45,7 @@ class Game(object):
         self.addr = self.get_addr()
         self.main_server = main_server
         self.addr_remote_servers = addr_remote_servers
-        self.remote_servers = []
+        self.servers = []
 
         self.remote = remote
         # Graphic variables.
@@ -78,10 +79,11 @@ class Game(object):
     def draw_robots(self):
         """Draw robots on the table."""
         if len(self.robots) == 0:
-            pass
-        for server in self.remote_servers:
-            robot = server.robot
-            leds = robot.leds
+            for i in range(len(self.servers)):
+                self.robots.append(self.gui.get_robot_drawing())
+
+        for i in range(len(self.servers)):
+            leds = self.network.get_irs(self.servers[i])
             leds['front'] = self._apply_calibration_factors(leds['front'],
                                                             self.x_factors,
                                                             self.y_factors)
@@ -91,7 +93,20 @@ class Game(object):
             leds['right'] = self._apply_calibration_factors(leds['right'],
                                                             self.x_factors,
                                                             self.y_factors)
-            robot.draw(leds)
+            self.robots[i].draw(leds)
+        # for server in self.remote_servers:
+        #     robot = server.robot
+        #     leds = robot.leds
+        #     leds['front'] = self._apply_calibration_factors(leds['front'],
+        #                                                     self.x_factors,
+        #                                                     self.y_factors)
+        #     leds['left'] = self._apply_calibration_factors(leds['left'],
+        #                                                    self.x_factors,
+        #                                                    self.y_factors)
+        #     leds['right'] = self._apply_calibration_factors(leds['right'],
+        #                                                     self.x_factors,
+        #                                                     self.y_factors)
+        #     robot.draw(leds)
 
     def _apply_calibration_factors(self, led, x_factors, y_factors):
         """Return the led's location calibrated."""
@@ -121,6 +136,7 @@ class Game(object):
         self.game_management.start(self.main_server, self.get_addr())
         self.x_factors = self.game_management.x_factors
         self.y_factors = self.game_management.y_factors
+        self.servers = self.game_management.servers
         #debug
         # print "Width " + str(self.screen_width)
         # print "height " + str(self.screen_height)
@@ -142,19 +158,19 @@ class Game(object):
         self.rec_height = self.screen_height / 5
         self.board = self._create_board(5, 10)
 
-        leds = self.robot.leds
-        leds['front'] = self._apply_calibration_factors(leds['front'],
-                                                        self.x_factors,
-                                                        self.y_factors)
-        leds['left'] = self._apply_calibration_factors(leds['left'],
-                                                       self.x_factors,
-                                                       self.y_factors)
-        leds['right'] = self._apply_calibration_factors(leds['right'],
-                                                        self.x_factors,
-                                                        self.y_factors)
-        self.robot.draw(leds)
+        # leds = self.robot.leds
+        # leds['front'] = self._apply_calibration_factors(leds['front'],
+        #                                                 self.x_factors,
+        #                                                 self.y_factors)
+        # leds['left'] = self._apply_calibration_factors(leds['left'],
+        #                                                self.x_factors,
+        #                                                self.y_factors)
+        # leds['right'] = self._apply_calibration_factors(leds['right'],
+        #                                                 self.x_factors,
+        #                                                 self.y_factors)
+        # self.robot.draw(leds)
 
-        # self.draw_robots()
+        self.draw_robots()
         self.canvas.pack(fill=Tkinter.BOTH, expand=1)
 
         self.canvas.after(100, self._update_map)
@@ -170,17 +186,17 @@ class Game(object):
 
         """
         #debug
-        leds = self.robot.leds
-        leds['front'] = self._apply_calibration_factors(leds['front'],
-                                                        self.x_factors,
-                                                        self.y_factors)
-        leds['left'] = self._apply_calibration_factors(leds['left'],
-                                                       self.x_factors,
-                                                       self.y_factors)
-        leds['right'] = self._apply_calibration_factors(leds['right'],
-                                                        self.x_factors,
-                                                        self.y_factors)
-        self.robot.draw(leds)
+        # leds = self.robot.leds
+        # leds['front'] = self._apply_calibration_factors(leds['front'],
+        #                                                 self.x_factors,
+        #                                                 self.y_factors)
+        # leds['left'] = self._apply_calibration_factors(leds['left'],
+        #                                                self.x_factors,
+        #                                                self.y_factors)
+        # leds['right'] = self._apply_calibration_factors(leds['right'],
+        #                                                 self.x_factors,
+        #                                                 self.y_factors)
+        # self.robot.draw(leds)
 
         # if self._is_led_on_screen(x1, y1):
         #     num_column = int(x1 / self.rec_width)
@@ -221,7 +237,7 @@ class GameManagement(object):
         self._x_factors = None
         self._y_factors = None
 
-        self.addr_servers = []
+        self.servers = []
         self.nb_servers = nb_servers
         self.servers_ready = False
 
@@ -243,10 +259,10 @@ class GameManagement(object):
         # addr = 'http://' + addr + ':5000'
         addr = 'http://10.4.9.7:5000'
         if main_server:
-            self.addr_servers.append(addr)
+            self.servers.append(addr)
             self.wait_addr_servers()
             self._x_factors, self._y_factors = self.do_calibration()
-            self.send_addr_servers()
+            self.send_list_servers()
             self.synchronise_servers()
         else:
             self.send_addr_to_main_server(addr)
@@ -266,18 +282,18 @@ class GameManagement(object):
         #     self._init_graphic()
         # self.robot.robot_drawing.canvas = self.canvas
 
-    def send_addr_servers(self):
-        for addr in self.addr_servers[1:]:
+    def send_list_servers(self):
+        for addr in self.servers[1:]:
             #debug
             print addr
-            self.network.send_addr_servers(addr, self.addr_servers)
+            self.network.send_list_servers(addr, self.servers)
 
     def wait_addr_servers(self):
-        while len(self.addr_servers) != self.nb_servers:
+        while len(self.servers) != self.nb_servers:
             time.sleep(1)
 
     def launch_game(self):
-        for addr in self.addr_servers[1:]:
+        for addr in self.servers[1:]:
             self.network.launch(addr)
 
     # def _init_servers(self):
@@ -305,7 +321,7 @@ class GameManagement(object):
         print 'Game launched.'
 
     def is_servers_ready(self):
-        for addr_server in self.addr_servers:
+        for addr_server in self.servers:
             if  self.network.is_ready == 'False':
                 return False
         return True
