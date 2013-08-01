@@ -1,68 +1,50 @@
-# import Tkinter
 import mtTkinter as Tkinter
 import time
 import numpy
 import copy
 import socket
 import math
-import numpy
 
 
 class Game(object):
     """Create a game.
 
     :param robot: Robot object used on the table.
-    :param gui: (optional) GUI object.
-    :param remote_server_object: (optional) This object will be copied and used
-        to simulate each other remote RoboTable.
-    :param main_server: (optional) True if this is the main server.
-    :param addr_remote_servers: (optional) A list containing the address
-        of the other RoboTables.
-    :param remote: (optional) If true, indicates that the object is a remote server.
-        If false, the initialisation of the screen is performed.
-    :param name: (optional) Name of the game.
-
-    **Note:** most of the arguments are optionals to facilitate the creation of the
-    remote_server_object (but have to be provided if remote=false).
+    :param sensor: Sensor object used to detect IRs.
+    :param network: Network object used to communicate between tables.
+    :param gui: GUI object.
+    :param game_management: GameManagement object.
+    :param main_server: Main server's IP address.
 
     """
-    def __init__(self, robot, network=None, gui=None, game_management=None,
-                 remote_server_object=None,
-                 main_server=True, addr_remote_servers=None,
-                 remote=False, name=None):
-        self.name = name
+    def __init__(self, robot, sensor, network, gui, game_management, main_server):
         self.robot = robot
-        self.sensor = robot.sensor
-        self.game_management = game_management
-        self.remote_server_object = remote_server_object
-        self.ready = False
-        self.robots = []
+        self.sensor = sensor
         self.network = network
+        self.game_management = game_management
+        self.main_server = main_server
 
+        self.robots = []
         self.x_factors = None
         self.y_factors = None
-
         self.addr = self.get_addr()
-        self.main_server = main_server
-        self.addr_remote_servers = addr_remote_servers
         self.servers = []
 
-        self.remote = remote
         # Graphic variables.
         self.gui = gui
-        if self.gui is not None:
-            self.root = self.gui.root
-            self.screen_width = self.gui.screen_width
-            self.screen_height = self.gui.screen_height
-            self.canvas = self.gui.canvas
-            self.robot.robot_drawing.canvas = self.canvas
+        self.root = self.gui.root
+        self.screen_width = self.gui.screen_width
+        self.screen_height = self.gui.screen_height
+        self.canvas = self.gui.canvas
+        self.robot.robot_drawing.canvas = self.canvas
 
     def load_map(self, path):
+        """Load the map on the canvas."""
         self.gui.load_map(path)
 
     def is_main_server(self):
         """Return if the server is the main server."""
-        return self.main_server
+        return self.addr == self.main_server
 
     def get_addr(self):
         """Return the ip address of the server.
@@ -132,25 +114,10 @@ class Game(object):
 
         """
 
-        # Pause of 10s, the time to have the address of all the servers
         self.game_management.start(self.main_server, self.get_addr())
         self.x_factors = self.game_management.x_factors
         self.y_factors = self.game_management.y_factors
         self.servers = self.game_management.servers
-        #debug
-        # print "Width " + str(self.screen_width)
-        # print "height " + str(self.screen_height)
-
-        #debug
-        # print "X factors:"
-        # print "alpha: " + str(self.x_factors[0])
-        # print "beta: " + str(self.x_factors[1])
-        # print "delta: " + str(self.x_factors[2])
-
-        # print "Y factors:"
-        # print "alpha: " + str(self.y_factors[0])
-        # print "beta: " + str(self.y_factors[1])
-        # print "delta: " + str(self.y_factors[2])
 
         # Define the width and height of a rectangle on the map,
         # and then create an array that represent the map
@@ -158,21 +125,8 @@ class Game(object):
         self.rec_height = self.screen_height / 5
         self.board = self._create_board(5, 10)
 
-        # leds = self.robot.leds
-        # leds['front'] = self._apply_calibration_factors(leds['front'],
-        #                                                 self.x_factors,
-        #                                                 self.y_factors)
-        # leds['left'] = self._apply_calibration_factors(leds['left'],
-        #                                                self.x_factors,
-        #                                                self.y_factors)
-        # leds['right'] = self._apply_calibration_factors(leds['right'],
-        #                                                 self.x_factors,
-        #                                                 self.y_factors)
-        # self.robot.draw(leds)
-
         self.draw_robots()
         self.canvas.pack(fill=Tkinter.BOTH, expand=1)
-
         self.canvas.after(100, self._update_map)
         self.root.mainloop()
 
@@ -185,18 +139,6 @@ class Game(object):
         draw rectangles when needed.
 
         """
-        #debug
-        # leds = self.robot.leds
-        # leds['front'] = self._apply_calibration_factors(leds['front'],
-        #                                                 self.x_factors,
-        #                                                 self.y_factors)
-        # leds['left'] = self._apply_calibration_factors(leds['left'],
-        #                                                self.x_factors,
-        #                                                self.y_factors)
-        # leds['right'] = self._apply_calibration_factors(leds['right'],
-        #                                                 self.x_factors,
-        #                                                 self.y_factors)
-        # self.robot.draw(leds)
 
         # if self._is_led_on_screen(x1, y1):
         #     num_column = int(x1 / self.rec_width)
@@ -227,18 +169,27 @@ class Game(object):
 
 
 class GameManagement(object):
-    """docstring for GameManagement"""
+    """docstring for GameManagement.
+
+    :param sensor: Sensor object used to detect IRs.
+    :param gui: GUI object.
+    :param network: Network object used to communicate between tables.
+    :param nb_servers: Number of player/server.
+
+    """
     def __init__(self, sensor, gui, network, nb_servers):
         self.sensor = sensor
         self.gui = gui
+        self.network = network
+
         self.screen_width = self.gui.screen_width
         self.screen_height = self.gui.screen_height
-        self.network = network
         self._x_factors = None
         self._y_factors = None
 
         self.servers = []
         self.nb_servers = nb_servers
+        self.ready = False
         self.servers_ready = False
 
     @property
@@ -256,61 +207,48 @@ class GameManagement(object):
         return self._y_factors
 
     def start(self, main_server, addr):
+        """Execute the needed steps before launching a game."""
         # addr = 'http://' + addr + ':5000'
-        addr = 'http://10.4.9.7:5000'
-        if main_server:
+        addr = '10.4.9.7'
+        # if main_server:
+        if True:
             self.servers.append(addr)
             self.wait_addr_servers()
             self._x_factors, self._y_factors = self.do_calibration()
+            self.ready = True
             self.send_list_servers()
             self.synchronise_servers()
         else:
             self.send_addr_to_main_server(addr)
             self._x_factors, self._y_factors = self.do_calibration()
+            self.ready = True
             self.wait_servers()
 
-
-        # self.send_addr_remote_to_remote()
-        # self._init_servers()
-        # self.ready = True
-        # if self.is_main_server():
-        #     self.synchronise_servers()
-        # else:
-        #     self.wait_servers()
-
-        # if self.remote is False:
-        #     self._init_graphic()
-        # self.robot.robot_drawing.canvas = self.canvas
-
     def send_list_servers(self):
+        """Send a list containing the address of all
+        servers to each server.
+
+        """
         for addr in self.servers[1:]:
-            #debug
-            print addr
             self.network.send_list_servers(addr, self.servers)
 
     def wait_addr_servers(self):
+        """Wait that all servers have sent their address."""
         while len(self.servers) != self.nb_servers:
             time.sleep(1)
 
     def launch_game(self):
+        """Launch the game on each server."""
         for addr in self.servers[1:]:
             self.network.launch(addr)
 
-    # def _init_servers(self):
-    #     """Create the remote servers' object and
-    #     append to the list self.remote_servers.
-    #     """
-    #     for addr_remote_server in self.addr_remote_servers:
-    #         remote_server = copy.deepcopy(self.remote_server_object)
-    #         remote_server.robot.sensor.addr = addr_remote_server
-    #         remote_server.robot.robot_drawing.canvas = self.canvas
-    #         self.remote_servers.append(remote_server)
-
     def wait_servers(self):
+        """Wait that all servers are ready."""
         while self.servers_ready is False:
             time.sleep(1)
 
     def synchronise_servers(self):
+        """Synchronise each servers and launch the game."""
         print 'Waiting for the other servers...'
         while self.servers_ready is False:
             if self.is_servers_ready():
@@ -321,8 +259,9 @@ class GameManagement(object):
         print 'Game launched.'
 
     def is_servers_ready(self):
+        """Return true if all servers are ready."""
         for addr_server in self.servers:
-            if  self.network.is_ready == 'False':
+            if  self.network.is_ready == False:
                 return False
         return True
 
@@ -410,7 +349,7 @@ class GameManagement(object):
 
     def _calculate_calibration_n(self, leds_location_screen,
                                leds_location_wiimote):
-        """Voir equation (10)"""
+        """See equation (10)"""
         if len(leds_location_wiimote) != len(leds_location_screen):
             #TODO add throw exception
             print 'The two list have not the same length'
@@ -475,7 +414,7 @@ class GameManagement(object):
 
 
     def do_calibration(self):
-        """Draw three crosshairs and then return the calibration's factors
+        """Draw X crosshairs and then return the calibration's factors
         (x_factors and y_factors) using the _calculate_calibration method.
         """
 

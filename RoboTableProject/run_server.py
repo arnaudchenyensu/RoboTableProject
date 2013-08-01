@@ -46,14 +46,10 @@ def launch():
     network = Network()
     gui = GUI()
     game_management = GameManagement(wiimote, gui, network, 2)
-    servers = ['http://10.4.9.4:5000', 'http://10.4.9.1:5000']
+    main_server = '10.4.9.7'
     robot = Robot(wiimote, gui=gui)
-    robot2 = Robot(network)
-    remote_server_object = Game(robot2, remote=True)
 
-
-    game = Game(robot, network=network, gui=gui, game_management=game_management, remote_server_object=remote_server_object,
-             main_server=True, addr_remote_servers=servers)
+    game = Game(robot, wiimote, network, gui, game_management, main_server)
     path_img = 'RoboTableProject/img/temp5.jpg'
     game.load_map(path_img)
     game.start()
@@ -71,16 +67,17 @@ def irs():
     return json.dumps(game.robot.leds)
 
 
-@app.route("/is_ready/")
+@app.route("/ready/")
 def is_ready():
-    return json.dumps('True')
+    global game_management
+    return json.dumps(game_management.ready)
 
 
 @app.route("/servers_ready/", methods=['GET', 'POST'])
 def servers_ready():
     global game
     if request.method == 'POST':
-        game.servers_ready = 'True'
+        game.servers_ready = True
     return json.dumps(game.servers_ready)
 
 @app.route("/servers/", methods=['GET', 'POST'])
@@ -88,22 +85,19 @@ def servers():
     global game_management
     if request.method == 'POST':
         game_management.servers = json.loads(request.get_data())
-        return json.dumps('True')
     return json.dumps(game_management.servers)
 
 @app.route("/servers/new", methods=['POST'])
 def new_server():
     global game_management
-    if request.method == 'POST':
-        game_management.servers.append(json.loads(request.get_data()))
-        return json.dumps('True')
-    return json.dumps('False')
+    game_management.servers.append(json.loads(request.get_data()))
+    return json.dumps(True)
 
 @app.route("/launch/", methods=['POST'])
 def launch_game():
     global game_management
     game_management.servers_ready = True
-    return json.dumps('True')
+    return json.dumps(True)
 
 app.run(host='0.0.0.0')
 
