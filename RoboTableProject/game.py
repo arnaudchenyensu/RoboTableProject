@@ -14,15 +14,15 @@ class Game(object):
     :param network: Network object used to communicate between tables.
     :param gui: GUI object.
     :param game_management: GameManagement object.
-    :param main_server: Main server's IP address.
+    :param addr_main_server: Main server's IP address.
 
     """
-    def __init__(self, robot, sensor, network, gui, game_management, main_server):
+    def __init__(self, robot, sensor, network, gui, game_management, addr_main_server):
         self.robot = robot
         self.sensor = sensor
         self.network = network
         self.game_management = game_management
-        self.main_server = main_server
+        self.addr_main_server = addr_main_server
 
         self.robots = []
         self.x_factors = None
@@ -44,7 +44,7 @@ class Game(object):
 
     def is_main_server(self):
         """Return if the server is the main server."""
-        return self.addr == self.main_server
+        return self.addr == self.addr_main_server
 
     def get_addr(self):
         """Return the ip address of the server.
@@ -66,39 +66,19 @@ class Game(object):
 
         for i in range(len(self.servers)):
             leds = self.network.get_irs(self.servers[i])
-            leds['front'] = self._apply_calibration_factors(leds['front'],
-                                                            self.x_factors,
-                                                            self.y_factors)
-            leds['left'] = self._apply_calibration_factors(leds['left'],
-                                                           self.x_factors,
-                                                           self.y_factors)
-            leds['right'] = self._apply_calibration_factors(leds['right'],
-                                                            self.x_factors,
-                                                            self.y_factors)
+            leds = self._apply_calibration_factors(leds, self.x_factors, self.y_factors)
             self.robots[i].draw(leds)
-        # for server in self.remote_servers:
-        #     robot = server.robot
-        #     leds = robot.leds
-        #     leds['front'] = self._apply_calibration_factors(leds['front'],
-        #                                                     self.x_factors,
-        #                                                     self.y_factors)
-        #     leds['left'] = self._apply_calibration_factors(leds['left'],
-        #                                                    self.x_factors,
-        #                                                    self.y_factors)
-        #     leds['right'] = self._apply_calibration_factors(leds['right'],
-        #                                                     self.x_factors,
-        #                                                     self.y_factors)
-        #     robot.draw(leds)
 
-    def _apply_calibration_factors(self, led, x_factors, y_factors):
-        """Return the led's location calibrated."""
-        led['X'] = (led['X'] * x_factors[0]
-                    + led['Y'] * x_factors[1]
-                    + x_factors[2])
-        led['Y'] = (led['X'] * y_factors[0]
-                    + (self.sensor.height_resolution - led['Y']) * y_factors[1]
-                    + y_factors[2])
-        return led
+    def _apply_calibration_factors(self, leds, x_factors, y_factors):
+        """Return the leds' location calibrated."""
+        for led in leds:
+            leds[led]['X'] = (leds[led]['X'] * x_factors[0]
+                              + leds[led]['Y'] * x_factors[1]
+                              + x_factors[2])
+            leds[led]['Y'] = (leds[led]['X'] * y_factors[0]
+                              + (self.sensor.height_resolution - leds[led]['Y']) * y_factors[1]
+                              + y_factors[2])
+        return leds
 
     def _create_board(self, rows, columns):
         """Return a list that simulate a map."""
@@ -114,7 +94,7 @@ class Game(object):
 
         """
 
-        self.game_management.start(self.main_server, self.get_addr())
+        self.game_management.start(self.addr_main_server, self.is_main_server(), self.addr)
         self.x_factors = self.game_management.x_factors
         self.y_factors = self.game_management.y_factors
         self.servers = self.game_management.servers
@@ -206,12 +186,15 @@ class GameManagement(object):
             print "The calibration was not done"
         return self._y_factors
 
-    def start(self, main_server, addr):
-        """Execute the needed steps before launching a game."""
-        # addr = 'http://' + addr + ':5000'
-        addr = '10.4.9.7'
-        # if main_server:
-        if True:
+    def start(self, addr_main_server, is_main_server, addr):
+        """Execute the needed steps before launching a game.
+
+        :param addr_main_server: Main server's IP address.
+        :param is_main_server: True if this is the main server.
+        :param addr: address of the server on which this method is called.
+
+        """
+        if is_main_server:
             self.servers.append(addr)
             self.wait_addr_servers()
             self._x_factors, self._y_factors = self.do_calibration()
@@ -219,7 +202,7 @@ class GameManagement(object):
             self.send_list_servers()
             self.synchronise_servers()
         else:
-            self.send_addr_to_main_server(addr)
+            self.network.send_addr(addr_main_server, addr)
             self._x_factors, self._y_factors = self.do_calibration()
             self.ready = True
             self.wait_servers()
@@ -261,7 +244,7 @@ class GameManagement(object):
     def is_servers_ready(self):
         """Return true if all servers are ready."""
         for addr_server in self.servers:
-            if  self.network.is_ready == False:
+            if  self.network.is_ready(addr_server) == False:
                 return False
         return True
 

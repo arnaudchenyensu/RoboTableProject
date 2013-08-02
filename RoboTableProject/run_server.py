@@ -46,10 +46,10 @@ def launch():
     network = Network()
     gui = GUI()
     game_management = GameManagement(wiimote, gui, network, 2)
-    main_server = '10.4.9.7'
+    addr_main_server = '10.4.9.4'
     robot = Robot(wiimote, gui=gui)
 
-    game = Game(robot, wiimote, network, gui, game_management, main_server)
+    game = Game(robot, wiimote, network, gui, game_management, addr_main_server)
     path_img = 'RoboTableProject/img/temp5.jpg'
     game.load_map(path_img)
     game.start()
@@ -75,10 +75,10 @@ def is_ready():
 
 @app.route("/servers_ready/", methods=['GET', 'POST'])
 def servers_ready():
-    global game
+    global game_management
     if request.method == 'POST':
-        game.servers_ready = True
-    return json.dumps(game.servers_ready)
+        game_management.servers_ready = True
+    return json.dumps(game_management.servers_ready)
 
 @app.route("/servers/", methods=['GET', 'POST'])
 def servers():
@@ -87,7 +87,7 @@ def servers():
         game_management.servers = json.loads(request.get_data())
     return json.dumps(game_management.servers)
 
-@app.route("/servers/new", methods=['POST'])
+@app.route("/servers/new/", methods=['POST'])
 def new_server():
     global game_management
     game_management.servers.append(json.loads(request.get_data()))
