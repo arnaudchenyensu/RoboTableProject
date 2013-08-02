@@ -7,16 +7,24 @@ Robot
 .. autoclass:: robot.Robot
     :members:
 
-.. autoclass:: robot.RobotDrawing
-    :members:
-
 Game
 ----
 
 .. autoclass:: game.Game
     :members:
 
-.. autoclass:: game.Crosshair
+.. autoclass:: game.GameManagement
+    :members:
+
+Graphic
+-------
+.. autoclass:: graphic.GUI
+    :members:
+
+.. autoclass:: graphic.Crosshair
+    :members:
+
+.. autoclass:: graphic.RobotDrawing
     :members:
 
 Wiimote

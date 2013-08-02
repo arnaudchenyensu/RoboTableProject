@@ -69,7 +69,7 @@ class GUI(object):
         """Change and return the coordinates of the object.
 
         :param object_id: Id of the object.
-        :param *coords: (optional) List of coordinate pairs.
+        :param \*coords: (optional) List of coordinate pairs.
 
         **Note:** Same effect as the `Tkinter's method <http://goo.gl/1PMqtC>`_.
 
