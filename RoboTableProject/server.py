@@ -46,7 +46,7 @@ def launch():
     network = Network()
     gui = GUI()
     game_management = GameManagement(wiimote, gui, network, 2)
-    addr_main_server = '10.4.9.4'
+    addr_main_server = '10.4.9.7'
     robot = Robot(wiimote, gui=gui)
 
     game = Game(robot, wiimote, network, gui, game_management, addr_main_server)
@@ -80,18 +80,20 @@ def servers_ready():
         game_management.servers_ready = True
     return json.dumps(game_management.servers_ready)
 
-@app.route("/servers/", methods=['GET', 'POST'])
+@app.route("/servers/", methods=['GET', 'POST', 'PUT'])
 def servers():
     global game_management
     if request.method == 'POST':
+        game_management.servers.append(json.loads(request.get_data()))
+    if request.method == 'PUT':
         game_management.servers = json.loads(request.get_data())
     return json.dumps(game_management.servers)
 
-@app.route("/servers/new/", methods=['POST'])
-def new_server():
-    global game_management
-    game_management.servers.append(json.loads(request.get_data()))
-    return json.dumps(True)
+# @app.route("/servers/new/", methods=['POST'])
+# def new_server():
+#     global game_management
+#     game_management.servers.append(json.loads(request.get_data()))
+#     return json.dumps(True)
 
 @app.route("/launch/", methods=['POST'])
 def launch_game():
