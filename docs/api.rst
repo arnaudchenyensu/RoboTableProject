@@ -1,12 +1,6 @@
 API Documentation
 =================
 
-Robot
------
-
-.. autoclass:: robot.Robot
-    :members:
-
 Game
 ----
 
@@ -27,14 +21,21 @@ Graphic
 .. autoclass:: graphic.RobotDrawing
     :members:
 
+Network
+-------
+
+.. autoclass:: network.Network
+    :members:
+
+Robot
+-----
+
+.. autoclass:: robot.Robot
+    :members:
+
 Wiimote
 -------
 
 .. autoclass:: wiimote.Wiimote
     :members:
 
-Network
--------
-
-.. autoclass:: network.Network
-    :members:
