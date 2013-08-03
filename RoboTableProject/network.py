@@ -3,11 +3,18 @@ import json
 
 
 class Network(object):
-    """Create a Network object."""
+    """Create a Network object.
 
-    def format(self, addr_server, port=5000):
+    :param port: (optional) Port used to communicate.
+
+    """
+
+    def __init__(self, port=5000):
+        self.port = port
+
+    def format(self, addr_server):
         """Format the address and return it."""
-        return 'http://' + addr_server + ':' + str(port)
+        return 'http://' + addr_server + ':' + str(self.port)
 
     def get_irs(self, addr_server):
         """Return the IRs' location of a server."""
