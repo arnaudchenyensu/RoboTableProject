@@ -1,8 +1,6 @@
 import cwiid
 import time
 
-wii = 0
-
 
 class Wiimote(object):
     """Create a Wiimote object and
@@ -16,6 +14,7 @@ class Wiimote(object):
     def __init__(self, width_resolution=1024, height_resolution=768, test=False):
         self.width_resolution = width_resolution
         self.height_resolution = height_resolution
+        self.wii = None
         if test is False:
             self.connect()
 
@@ -27,9 +26,8 @@ class Wiimote(object):
         # Connect to the Wii Remote. If it times out
         # then quit.
         try:
-            global wii
-            wii = cwiid.Wiimote()
-            wii.led = 1
+            self.wii = cwiid.Wiimote()
+            self.wii.led = 1
             return True
         except RuntimeError:
             return False
@@ -37,11 +35,10 @@ class Wiimote(object):
 
     def disconnect(self):
         """Disconnect the wiimote to the dongle Bluetooth."""
-        global wii
-        wii.rumble = 1
+        self.wii.rumble = 1
         time.sleep(1)
-        wii.rumble = 0
-        wii = 0
+        self.wii.rumble = 0
+        self.wii = 0
         return 'Connection closed'
 
     def get_leds(self):
@@ -52,10 +49,9 @@ class Wiimote(object):
         **Note:** If the location of a led is not detected, X and Y equal -1.
 
         """
-        global wii
-        wii.rpt_mode = cwiid.RPT_IR
+        self.wii.rpt_mode = cwiid.RPT_IR
         irs = []
-        for src in wii.state['ir_src']:
+        for src in self.wii.state['ir_src']:
             if src:
                 pos = {
                     "X": src['pos'][0],
