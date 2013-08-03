@@ -38,6 +38,19 @@ class GUI(object):
         self.tkimage = ImageTk.PhotoImage(im)
         self.canvas.create_image(self.screen_width/2, self.screen_height/2, image=self.tkimage)
 
+    def mainloop(self):
+        """Start the graphic mainloop."""
+        self.root.mainloop()
+
+    def after(self, secs, function):
+        """Call the function every secs.
+
+        :param secs: Time interval in seconds.
+        :param function: The function to call.
+
+        """
+        self.root.after(secs, function)
+
     def draw_crosshair(self, x, y):
         crosshair = Crosshair(self, x, y)
         crosshair.draw()
@@ -83,6 +96,9 @@ class GUI(object):
 
         """
         self.canvas.delete(object_id)
+
+    def qui(self):
+        self.root.quit()
 
 class Crosshair(object):
     """Create a Crosshair object.

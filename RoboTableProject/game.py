@@ -1,4 +1,3 @@
-import mtTkinter as Tkinter
 import time
 import numpy
 import copy
@@ -35,8 +34,7 @@ class Game(object):
         self.root = self.gui.root
         self.screen_width = self.gui.screen_width
         self.screen_height = self.gui.screen_height
-        self.canvas = self.gui.canvas
-        self.robot.robot_drawing.canvas = self.canvas
+        self.robot.robot_drawing.canvas = self.gui.canvas
 
     def load_map(self, path):
         """Load the map on the canvas."""
@@ -106,13 +104,13 @@ class Game(object):
         self.board = self._create_board(5, 10)
 
         self.draw_robots()
-        self.canvas.pack(fill=Tkinter.BOTH, expand=1)
-        self.canvas.after(100, self._update_map)
-        self.root.mainloop()
+        # self.canvas.pack(fill=Tkinter.BOTH, expand=1)
+        self.gui.after(100, self._update_map)
+        self.gui.mainloop()
 
     def stop(self):
         """Stop the game."""
-        self.root.quit()
+        self.gui.quit()
 
     def _update_map(self):
         """Update the map. e.g Update circles' location and
@@ -131,7 +129,7 @@ class Game(object):
         self.draw_robots()
 
         #debug : the delay is shorter
-        self.canvas.after(100, self._update_map)
+        self.gui.after(100, self._update_map)
 
     def _is_rec_already_drawn(self, num_row, num_column):
         """Return True if a rectangle is already drawn."""
@@ -142,10 +140,6 @@ class Game(object):
         is_x_on_screen = ((x > -1) and (x < self.screen_width))
         is_y_on_screen = ((y > -1) and (y < self.screen_height))
         return is_x_on_screen and is_y_on_screen
-
-    def _draw_rec(self, x, y, width, height, outline_color='#fb0', fill_color=None):
-        """Draw a rectangle."""
-        self.canvas.create_rectangle(x, y, x+width, y+height, outline=outline_color, fill=fill_color)
 
 
 class GameManagement(object):
