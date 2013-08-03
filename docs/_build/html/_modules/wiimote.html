@@ -51,8 +51,6 @@
 <span class="kn">import</span> <span class="nn">cwiid</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
-<span class="n">wii</span> <span class="o">=</span> <span class="mi">0</span>
-
 
 <div class="viewcode-block" id="Wiimote"><a class="viewcode-back" href="../api.html#wiimote.Wiimote">[docs]</a><span class="k">class</span> <span class="nc">Wiimote</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create a Wiimote object and</span>
@@ -66,6 +64,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width_resolution</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">height_resolution</span><span class="o">=</span><span class="mi">768</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">width_resolution</span> <span class="o">=</span> <span class="n">width_resolution</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">height_resolution</span> <span class="o">=</span> <span class="n">height_resolution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wii</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="k">if</span> <span class="n">test</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
 
@@ -77,9 +76,8 @@
         <span class="c"># Connect to the Wii Remote. If it times out</span>
         <span class="c"># then quit.</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">global</span> <span class="n">wii</span>
-            <span class="n">wii</span> <span class="o">=</span> <span class="n">cwiid</span><span class="o">.</span><span class="n">Wiimote</span><span class="p">()</span>
-            <span class="n">wii</span><span class="o">.</span><span class="n">led</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wii</span> <span class="o">=</span> <span class="n">cwiid</span><span class="o">.</span><span class="n">Wiimote</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wii</span><span class="o">.</span><span class="n">led</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">return</span> <span class="bp">True</span>
         <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">False</span>
@@ -87,11 +85,10 @@
 </div>
 <div class="viewcode-block" id="Wiimote.disconnect"><a class="viewcode-back" href="../api.html#wiimote.Wiimote.disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Disconnect the wiimote to the dongle Bluetooth.&quot;&quot;&quot;</span>
-        <span class="k">global</span> <span class="n">wii</span>
-        <span class="n">wii</span><span class="o">.</span><span class="n">rumble</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wii</span><span class="o">.</span><span class="n">rumble</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">wii</span><span class="o">.</span><span class="n">rumble</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">wii</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wii</span><span class="o">.</span><span class="n">rumble</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wii</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="s">&#39;Connection closed&#39;</span>
 </div>
 <div class="viewcode-block" id="Wiimote.get_leds"><a class="viewcode-back" href="../api.html#wiimote.Wiimote.get_leds">[docs]</a>    <span class="k">def</span> <span class="nf">get_leds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -102,10 +99,9 @@
 <span class="sd">        **Note:** If the location of a led is not detected, X and Y equal -1.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">global</span> <span class="n">wii</span>
-        <span class="n">wii</span><span class="o">.</span><span class="n">rpt_mode</span> <span class="o">=</span> <span class="n">cwiid</span><span class="o">.</span><span class="n">RPT_IR</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wii</span><span class="o">.</span><span class="n">rpt_mode</span> <span class="o">=</span> <span class="n">cwiid</span><span class="o">.</span><span class="n">RPT_IR</span>
         <span class="n">irs</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">src</span> <span class="ow">in</span> <span class="n">wii</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;ir_src&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">src</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">wii</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s">&#39;ir_src&#39;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">src</span><span class="p">:</span>
                 <span class="n">pos</span> <span class="o">=</span> <span class="p">{</span>
                     <span class="s">&quot;X&quot;</span><span class="p">:</span> <span class="n">src</span><span class="p">[</span><span class="s">&#39;pos&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>

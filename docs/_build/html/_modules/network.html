@@ -53,11 +53,18 @@
 
 
 <div class="viewcode-block" id="Network"><a class="viewcode-back" href="../api.html#network.Network">[docs]</a><span class="k">class</span> <span class="nc">Network</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Create a Network object.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Create a Network object.</span>
 
-<div class="viewcode-block" id="Network.format"><a class="viewcode-back" href="../api.html#network.Network.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr_server</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">5000</span><span class="p">):</span>
+<span class="sd">    :param port: (optional) Port used to communicate.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">5000</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">port</span>
+
+<div class="viewcode-block" id="Network.format"><a class="viewcode-back" href="../api.html#network.Network.format">[docs]</a>    <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr_server</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Format the address and return it.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s">&#39;http://&#39;</span> <span class="o">+</span> <span class="n">addr_server</span> <span class="o">+</span> <span class="s">&#39;:&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">&#39;http://&#39;</span> <span class="o">+</span> <span class="n">addr_server</span> <span class="o">+</span> <span class="s">&#39;:&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="Network.get_irs"><a class="viewcode-back" href="../api.html#network.Network.get_irs">[docs]</a>    <span class="k">def</span> <span class="nf">get_irs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr_server</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the IRs&#39; location of a server.&quot;&quot;&quot;</span>

@@ -48,7 +48,6 @@
           <div class="body">
             
   <h1>Source code for game</h1><div class="highlight"><pre>
-<span class="kn">import</span> <span class="nn">mtTkinter</span> <span class="kn">as</span> <span class="nn">Tkinter</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">copy</span>
@@ -85,8 +84,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">root</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">screen_width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">screen_width</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">screen_height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">screen_height</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">canvas</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">robot_drawing</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">robot</span><span class="o">.</span><span class="n">robot_drawing</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">canvas</span>
 
 <div class="viewcode-block" id="Game.load_map"><a class="viewcode-back" href="../api.html#game.Game.load_map">[docs]</a>    <span class="k">def</span> <span class="nf">load_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Load the map on the canvas.&quot;&quot;&quot;</span>
@@ -156,13 +154,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">board</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_board</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">draw_robots</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">Tkinter</span><span class="o">.</span><span class="n">BOTH</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">after</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_map</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
+        <span class="c"># self.canvas.pack(fill=Tkinter.BOTH, expand=1)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">after</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_map</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
 </div>
 <div class="viewcode-block" id="Game.stop"><a class="viewcode-back" href="../api.html#game.Game.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Stop the game.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
 </div>
     <span class="k">def</span> <span class="nf">_update_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update the map. e.g Update circles&#39; location and</span>
@@ -181,7 +179,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">draw_robots</span><span class="p">()</span>
 
         <span class="c">#debug : the delay is shorter</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">after</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_map</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">after</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_map</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_is_rec_already_drawn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_row</span><span class="p">,</span> <span class="n">num_column</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return True if a rectangle is already drawn.&quot;&quot;&quot;</span>
@@ -192,10 +190,6 @@
         <span class="n">is_x_on_screen</span> <span class="o">=</span> <span class="p">((</span><span class="n">x</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen_width</span><span class="p">))</span>
         <span class="n">is_y_on_screen</span> <span class="o">=</span> <span class="p">((</span><span class="n">y</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">y</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen_height</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">is_x_on_screen</span> <span class="ow">and</span> <span class="n">is_y_on_screen</span>
-
-    <span class="k">def</span> <span class="nf">_draw_rec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">outline_color</span><span class="o">=</span><span class="s">&#39;#fb0&#39;</span><span class="p">,</span> <span class="n">fill_color</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Draw a rectangle.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">create_rectangle</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="o">+</span><span class="n">width</span><span class="p">,</span> <span class="n">y</span><span class="o">+</span><span class="n">height</span><span class="p">,</span> <span class="n">outline</span><span class="o">=</span><span class="n">outline_color</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">fill_color</span><span class="p">)</span>
 
 </div>
 <div class="viewcode-block" id="GameManagement"><a class="viewcode-back" href="../api.html#game.GameManagement">[docs]</a><span class="k">class</span> <span class="nc">GameManagement</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -301,9 +295,10 @@
     <span class="k">def</span> <span class="nf">_calculate_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leds_location_screen</span><span class="p">,</span>
                                <span class="n">leds_location_wiimote</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the calibration&#39;s factors (x_factors and y_factors)</span>
+<span class="sd">        using 3 points.</span>
 
 <span class="sd">        :param leds_location_screen: e.g [[x1, y1], [x2, y2], [x3, y3]]</span>
-<span class="sd">        :param leds_location_wiimote: e.g [[x1, y1], [x2, y2], [x3, y3]]</span>
+<span class="sd">        :param leds_location_wiimote: e.g [[x1&#39;, y1&#39;], [x2&#39;, y2&#39;], [x3&#39;, y3&#39;]]</span>
 
 <span class="sd">        For the calculation, see the pdf `here &lt;http://goo.gl/pWYifa&gt;`_, equation (8)</span>
 
@@ -381,8 +376,17 @@
         <span class="k">return</span> <span class="n">x_factors</span><span class="p">,</span> <span class="n">y_factors</span>
 
     <span class="k">def</span> <span class="nf">_calculate_calibration_n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leds_location_screen</span><span class="p">,</span>
-                               <span class="n">leds_location_wiimote</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;See equation (10)&quot;&quot;&quot;</span>
+                                 <span class="n">leds_location_wiimote</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the calibration&#39;s factors (x_factors and y_factors)</span>
+<span class="sd">        using n points.</span>
+
+<span class="sd">        :param leds_location_screen: e.g [[x1, y1], [x2, y2], [x3, y3]]</span>
+<span class="sd">        :param leds_location_wiimote: e.g [[x1&#39;, y1&#39;], [x2&#39;, y2&#39;], [x3&#39;, y3&#39;]]</span>
+
+<span class="sd">        For the calculation, see the pdf `here &lt;http://goo.gl/pWYifa&gt;`_, equation (10)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">leds_location_wiimote</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">leds_location_screen</span><span class="p">):</span>
             <span class="c">#TODO add throw exception</span>
             <span class="k">print</span> <span class="s">&#39;The two list have not the same length&#39;</span>
@@ -447,8 +451,8 @@
 
 
 <div class="viewcode-block" id="GameManagement.do_calibration"><a class="viewcode-back" href="../api.html#game.GameManagement.do_calibration">[docs]</a>    <span class="k">def</span> <span class="nf">do_calibration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Draw X crosshairs and then return the calibration&#39;s factors</span>
-<span class="sd">        (x_factors and y_factors) using the _calculate_calibration method.</span>
+        <span class="sd">&quot;&quot;&quot;Draw 5 crosshairs and then return the calibration&#39;s factors</span>
+<span class="sd">        (x_factors and y_factors) using the _calculate_calibration_n method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">offset</span> <span class="o">=</span> <span class="mi">50</span>

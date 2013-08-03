@@ -245,9 +245,10 @@ class GameManagement(object):
     def _calculate_calibration(self, leds_location_screen,
                                leds_location_wiimote):
         """Return the calibration's factors (x_factors and y_factors)
+        using 3 points.
 
         :param leds_location_screen: e.g [[x1, y1], [x2, y2], [x3, y3]]
-        :param leds_location_wiimote: e.g [[x1, y1], [x2, y2], [x3, y3]]
+        :param leds_location_wiimote: e.g [[x1', y1'], [x2', y2'], [x3', y3']]
 
         For the calculation, see the pdf `here <http://goo.gl/pWYifa>`_, equation (8)
 
@@ -325,8 +326,17 @@ class GameManagement(object):
         return x_factors, y_factors
 
     def _calculate_calibration_n(self, leds_location_screen,
-                               leds_location_wiimote):
-        """See equation (10)"""
+                                 leds_location_wiimote):
+        """Return the calibration's factors (x_factors and y_factors)
+        using n points.
+
+        :param leds_location_screen: e.g [[x1, y1], [x2, y2], [x3, y3]]
+        :param leds_location_wiimote: e.g [[x1', y1'], [x2', y2'], [x3', y3']]
+
+        For the calculation, see the pdf `here <http://goo.gl/pWYifa>`_, equation (10)
+
+        """
+
         if len(leds_location_wiimote) != len(leds_location_screen):
             #TODO add throw exception
             print 'The two list have not the same length'
@@ -391,8 +401,8 @@ class GameManagement(object):
 
 
     def do_calibration(self):
-        """Draw X crosshairs and then return the calibration's factors
-        (x_factors and y_factors) using the _calculate_calibration method.
+        """Draw 5 crosshairs and then return the calibration's factors
+        (x_factors and y_factors) using the _calculate_calibration_n method.
         """
 
         offset = 50

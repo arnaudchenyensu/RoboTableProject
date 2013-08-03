@@ -88,6 +88,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">tkimage</span> <span class="o">=</span> <span class="n">ImageTk</span><span class="o">.</span><span class="n">PhotoImage</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">create_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen_width</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screen_height</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tkimage</span><span class="p">)</span>
 </div>
+<div class="viewcode-block" id="GUI.mainloop"><a class="viewcode-back" href="../api.html#graphic.GUI.mainloop">[docs]</a>    <span class="k">def</span> <span class="nf">mainloop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Start the graphic mainloop.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="GUI.after"><a class="viewcode-back" href="../api.html#graphic.GUI.after">[docs]</a>    <span class="k">def</span> <span class="nf">after</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secs</span><span class="p">,</span> <span class="n">function</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Call the function every secs.</span>
+
+<span class="sd">        :param secs: Time interval in seconds.</span>
+<span class="sd">        :param function: The function to call.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">after</span><span class="p">(</span><span class="n">secs</span><span class="p">,</span> <span class="n">function</span><span class="p">)</span>
+</div>
     <span class="k">def</span> <span class="nf">draw_crosshair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="n">crosshair</span> <span class="o">=</span> <span class="n">Crosshair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="n">crosshair</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
@@ -133,7 +146,10 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">object_id</span><span class="p">)</span>
-</div></div>
+</div>
+    <span class="k">def</span> <span class="nf">qui</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+</div>
 <div class="viewcode-block" id="Crosshair"><a class="viewcode-back" href="../api.html#graphic.Crosshair">[docs]</a><span class="k">class</span> <span class="nc">Crosshair</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create a Crosshair object.</span>
 

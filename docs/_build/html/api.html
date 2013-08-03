@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Robot Table 1.0 documentation" href="index.html" />
-    <link rel="prev" title="Quickstart" href="developer/quickstart.html" />
+    <link rel="prev" title="How to create a new game?" href="developer/create_new_game.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -38,7 +38,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="developer/quickstart.html" title="Quickstart"
+          <a href="developer/create_new_game.html" title="How to create a new game?"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Robot Table 1.0 documentation</a> &raquo;</li> 
       </ul>
@@ -134,8 +134,8 @@
 <dl class="method">
 <dt id="game.GameManagement.do_calibration">
 <tt class="descname">do_calibration</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/game.html#GameManagement.do_calibration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#game.GameManagement.do_calibration" title="Permalink to this definition">¶</a></dt>
-<dd><p>Draw X crosshairs and then return the calibration&#8217;s factors
-(x_factors and y_factors) using the _calculate_calibration method.</p>
+<dd><p>Draw 5 crosshairs and then return the calibration&#8217;s factors
+(x_factors and y_factors) using the _calculate_calibration_n method.</p>
 </dd></dl>
 
 <dl class="method">
@@ -204,6 +204,24 @@ servers to each server.</p>
 <em class="property">class </em><tt class="descclassname">graphic.</tt><tt class="descname">GUI</tt><a class="reference internal" href="_modules/graphic.html#GUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphic.GUI" title="Permalink to this definition">¶</a></dt>
 <dd><p>docstring for GUI</p>
 <dl class="method">
+<dt id="graphic.GUI.after">
+<tt class="descname">after</tt><big>(</big><em>secs</em>, <em>function</em><big>)</big><a class="reference internal" href="_modules/graphic.html#GUI.after"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphic.GUI.after" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call the function every secs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>secs</strong> &#8211; Time interval in seconds.</li>
+<li><strong>function</strong> &#8211; The function to call.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="graphic.GUI.coords">
 <tt class="descname">coords</tt><big>(</big><em>object_id</em>, <em>*coords</em><big>)</big><a class="reference internal" href="_modules/graphic.html#GUI.coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphic.GUI.coords" title="Permalink to this definition">¶</a></dt>
 <dd><p>Change and return the coordinates of the object.</p>
@@ -254,6 +272,12 @@ servers to each server.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="graphic.GUI.mainloop">
+<tt class="descname">mainloop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/graphic.html#GUI.mainloop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphic.GUI.mainloop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the graphic mainloop.</p>
 </dd></dl>
 
 <dl class="method">
@@ -329,11 +353,19 @@ servers to each server.</p>
 <h2>Network<a class="headerlink" href="#network" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="network.Network">
-<em class="property">class </em><tt class="descclassname">network.</tt><tt class="descname">Network</tt><a class="reference internal" href="_modules/network.html#Network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#network.Network" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">network.</tt><tt class="descname">Network</tt><big>(</big><em>port=5000</em><big>)</big><a class="reference internal" href="_modules/network.html#Network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#network.Network" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Network object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>port</strong> &#8211; (optional) Port used to communicate.</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="network.Network.format">
-<tt class="descname">format</tt><big>(</big><em>addr_server</em>, <em>port=5000</em><big>)</big><a class="reference internal" href="_modules/network.html#Network.format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#network.Network.format" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">format</tt><big>(</big><em>addr_server</em><big>)</big><a class="reference internal" href="_modules/network.html#Network.format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#network.Network.format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Format the address and return it.</p>
 </dd></dl>
 
@@ -488,7 +520,7 @@ connect to the dongle USB.</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="developer/quickstart.html" title="previous chapter">Quickstart</a></li>
+      <li>Previous: <a href="developer/create_new_game.html" title="previous chapter">How to create a new game?</a></li>
   </ul></li>
 </ul>
   <h3>This Page</h3>
